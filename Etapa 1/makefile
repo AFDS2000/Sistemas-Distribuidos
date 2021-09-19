@@ -1,17 +1,23 @@
-sc	= source/
-in	= include/
-ob	= object/
-bin = binary/
-fl	=  -Wall -I include -g
+SRC_dir	= source
+OBJ_dir	= object
+BIN_dir = binary
 
-test_data: $(ob)data.o $(ob)test_data.o
-	gcc $(fl) $(ob)data.o $(ob)test_data.o -o $(bin)test_data -lrt -lpthread -g
+test_data_objects = data.o test_data.o
 
-$(ob)test_data.o: $(in)data.h $(sc)test_data.c
-	gcc -c $(fl) $(sc)test_data.c -o $(ob)test_data.o
+data.o = data.h
+test_data.o = data.h
 
-$(ob)data.o: $(in)data.h $(sc)data.c
-	gcc -c $(fl) $(sc)data.c -o $(ob)data.o
+CC = gcc -g
+CFLAGS = -Wall -lrt -lpthread
+
+vpath %.o $(OBJ_dir)
+
+test_data: $(test_data_objects)
+	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_data_objects)) -o $(BIN_dir)/tdata 
+
+%.o: $(SRC_dir)/%.c $($@)
+	$(CC) -I include -o $(OBJ_dir)/$@ -c $<
 
 clean:
-	rm -f $(ob)data.o $(ob)teste_data.o test_data
+	rm -f $(OBJ_dir)/*.o
+	rm -f $(BIN_dir)/tdata

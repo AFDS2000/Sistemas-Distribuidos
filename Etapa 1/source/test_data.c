@@ -52,7 +52,7 @@ int testCreate2() {
 
 	assert(data_create2(-1, data_s) == NULL);
 	result = (data_create2(-1, data_s) == NULL);
-
+	
     	assert(data_create2(0, data_s) == NULL);
 	result = result && (data_create2(0, data_s) == NULL);
 

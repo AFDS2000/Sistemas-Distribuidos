@@ -18,6 +18,9 @@ test_data: $(test_data_objects)
 %.o: $(SRC_dir)/%.c $($@)
 	$(CC) -I include -o $(OBJ_dir)/$@ -c $<
 
+test_data_debbug:
+	valgrind --leak-check=full ./binary/test_data
+
 clean:
 	rm -f $(OBJ_dir)/*.o
-	rm -f $(BIN_dir)/test_data
+	rm -f $(BIN_dir)/*

@@ -94,4 +94,7 @@ struct data_t *data_dup(struct data_t *data)
 */
 void data_replace(struct data_t *data, int new_size, void *new_data)
 {
+    data->datasize = new_size;
+    free(data->data);
+    data->data = new_data;
 }

@@ -8,16 +8,15 @@
  */
 struct data_t *data_create(int size)
 {
-    if (size <= 0)
-    {
-        return NULL;
-    }
+    if (size <= 0) return NULL;
+
     struct data_t *d = (struct data_t *)malloc(sizeof(struct data_t));
     if (d == NULL)
     {
         free(d);
         return NULL;
     }
+
     d->datasize = size;
     d->data = malloc(size);
     if (d->data == NULL)
@@ -34,11 +33,8 @@ struct data_t *data_create(int size)
 struct data_t *data_create2(int size, void *data)
 {
     struct data_t *d = data_create(size);
-    if (d == NULL || size <= 0)
-    {
-        free(d);
-        return NULL;
-    }
+    if (d == NULL) return NULL;
+    
     if (data == NULL)
     {
         free(d->data);

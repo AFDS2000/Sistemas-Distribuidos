@@ -1,6 +1,6 @@
 #include "list.h"
-
-struct list_t; /* a definir pelo grupo em list-private.h */
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Função que cria uma nova lista (estrutura list_t a ser definida pelo
  * grupo no ficheiro list-private.h).

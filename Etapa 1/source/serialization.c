@@ -1,4 +1,5 @@
 #include "serialization.h"
+#include <stdio.h>
 
 /* Serializa uma estrutura data num buffer que será alocado
  * dentro da função. Além disso, retorna o tamanho do buffer

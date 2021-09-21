@@ -1,6 +1,6 @@
 #include "table.h"
-
-struct table_t; /* A definir pelo grupo em table-private.h */
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Função para criar/inicializar uma nova tabela hash, com n
  * linhas (n = módulo da função hash)

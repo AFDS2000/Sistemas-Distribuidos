@@ -39,8 +39,6 @@ int testDup() {
 		              (entry->value->datasize == entry2->value->datasize) &&
                         (memcmp(entry->value->data, entry2->value->data, entry->value->datasize) == 0);
 
-	printf("Comparação: %d", entry_compare(entry, *entry2));
-
 	entry_destroy(entry);
 	entry_destroy(entry2);
 

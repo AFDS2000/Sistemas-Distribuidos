@@ -3,14 +3,12 @@ OBJ_dir	= object
 BIN_dir = binary
 
 test_data_objects = data.o test_data.o
+test_entry_objects = data.o entry.o test_entry.o
 
 data.o = data.h
 test_data.o = data.h
-
-test_entry_objects = entry.o test_entry.o
-
-entry.o = entry.h
-test_entry.o = entry.h
+entry.o = data.h entry.h
+test_entry.o = data.h entry.h
 
 
 CC = gcc -g

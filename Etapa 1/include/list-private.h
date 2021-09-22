@@ -8,7 +8,7 @@ struct node_t {
 };
 
 struct list_t {
-
+    
 };
 
 void list_print(struct list_t* list);

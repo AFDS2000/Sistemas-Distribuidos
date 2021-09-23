@@ -2,16 +2,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "list-private.h"
+
 /* Função que cria uma nova lista (estrutura list_t a ser definida pelo
  * grupo no ficheiro list-private.h).
  * Em caso de erro, retorna NULL.
  */
-struct list_t *list_create();
+struct list_t *list_create(){
+
+    struct list_t *novoNo = malloc(sizeof(struct list_t));
+    novoNo->next = NULL;
+    return novoNo;
+}
 
 /* Função que elimina uma lista, libertando *toda* a memoria utilizada
  * pela lista.
  */
-void list_destroy(struct list_t *list);
+void list_destroy(struct list_t *list){
+
+    if(!list){
+        return;
+    }else{
+        list_destroy(list->next);
+        free(list);
+        list=NULL;
+    }
+}
 
 /* Função que adiciona no final da lista (tail) a entry passada como
 * argumento caso não exista na lista uma entry com key igual àquela

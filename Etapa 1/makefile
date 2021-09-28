@@ -7,7 +7,7 @@ test_data_objects = data.o test_data.o
 data.o = data.h
 test_data.o = data.h
 
-test_entry_objects = entry.o test_entry.o
+test_entry_objects = entry.o test_entry.o data.o
 
 entry.o = entry.h
 test_entry.o = entry.h

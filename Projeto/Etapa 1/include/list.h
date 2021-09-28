@@ -1,33 +1,21 @@
-#include "list.h"
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef _LIST_H
+#define _LIST_H /* Módulo list */
 
-#include "list-private.h"
+#include "data.h"
+#include "entry.h"
+
+struct list_t; /* a definir pelo grupo em list-private.h */
 
 /* Função que cria uma nova lista (estrutura list_t a ser definida pelo
  * grupo no ficheiro list-private.h).
  * Em caso de erro, retorna NULL.
  */
-struct list_t *list_create(){
-
-    struct list_t *novoNo = malloc(sizeof(struct list_t));
-    novoNo->next = NULL;
-    return novoNo;
-}
+struct list_t *list_create();
 
 /* Função que elimina uma lista, libertando *toda* a memoria utilizada
  * pela lista.
  */
-void list_destroy(struct list_t *list){
-
-    if(!list){
-        return;
-    }else{
-        list_destroy(list->next);
-        free(list);
-        list=NULL;
-    }
-}
+void list_destroy(struct list_t *list);
 
 /* Função que adiciona no final da lista (tail) a entry passada como
 * argumento caso não exista na lista uma entry com key igual àquela
@@ -71,3 +59,6 @@ void list_free_keys(char **keys);
 /* Função que imprime o conteúdo da lista para o terminal.
  */
 void list_print(struct list_t *list);
+
+
+#endif

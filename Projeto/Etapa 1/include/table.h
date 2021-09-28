@@ -1,6 +1,9 @@
-#include "table.h"
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef _TABLE_H
+#define _TABLE_H /* Módulo table */
+
+#include "data.h"
+
+struct table_t; /* A definir pelo grupo em table-private.h */
 
 /* Função para criar/inicializar uma nova tabela hash, com n
  * linhas (n = módulo da função hash)
@@ -56,3 +59,6 @@ void table_free_keys(char **keys);
 /* Função que imprime o conteúdo da tabela.
  */
 void table_print(struct table_t *table);
+
+
+#endif

@@ -1,5 +1,8 @@
-#include "serialization.h"
-#include <stdio.h>
+#ifndef _SERIALIZATION_H
+#define _SERIALIZATION_H
+
+#include "data.h"
+#include "entry.h"
 
 /* Serializa uma estrutura data num buffer que será alocado
  * dentro da função. Além disso, retorna o tamanho do buffer
@@ -26,3 +29,5 @@ int entry_to_buffer(struct entry_t *data, char **entry_buf);
  * Devolve NULL em caso de erro.
  */
 struct entry_t *buffer_to_entry(char *entry_buf, int entry_buf_size);
+
+#endif

@@ -32,11 +32,14 @@ test_entry: $(test_entry_objects)
 test_list: $(test_list_objects)
 	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_list_objects)) -o $(BIN_dir)/test_list
 
-test_data_debbug:
+test_data_debug:
 	valgrind --leak-check=full ./binary/test_data
 
-test_entry_debbug:
+test_entry_debug:
 	valgrind --leak-check=full ./binary/test_entry
+
+test_list_debug:
+	valgrind --leak-check=full ./binary/test_list
 
 clean:
 	rm -f $(OBJ_dir)/*.o

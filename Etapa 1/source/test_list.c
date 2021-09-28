@@ -190,11 +190,11 @@ int main() {
 	
 	score += testInsereMesmaKey();
 
-	score += testRemoveCabeca();
+	//score += testRemoveCabeca();
 
-	score += testRemoveCauda();
+	//score += testRemoveCauda();
 
-	score += testGetKeys();
+	//score += testGetKeys();
 
 	printf("teste list bin: %d/6\n",score);
 

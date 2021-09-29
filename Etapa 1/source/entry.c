@@ -1,5 +1,5 @@
 #include "entry.h"
-
+#include "data.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,10 +41,12 @@ void entry_destroy(struct entry_t *entry)
 
     if (entry != NULL)
     {
-        data_destroy(entry->value);
-        free(entry->key);
+        if (entry->value != NULL)
+            data_destroy(entry->value);
+        if (entry->key != NULL)
+            free(entry->key);
+        free(entry);
     }
-    free(entry);
 }
 
 /* Função que duplica uma entry, reservando a memória necessária para a

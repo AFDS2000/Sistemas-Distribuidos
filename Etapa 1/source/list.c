@@ -12,12 +12,14 @@
 struct list_t *list_create()
 {
     struct list_t *list = malloc(sizeof(struct list_t));
-
     if (list == NULL)
     {
         free(list);
         return NULL;
     }
+    list->head = NULL;
+
+    list->length = 0;
     return list;
 }
 
@@ -29,11 +31,14 @@ void list_destroy(struct list_t *list)
     while (list->head)
     {
         struct node_t *next = list->head->next;
-
-        entry_destroy(list->head->value);
-        free(list->head);
+        if (list->head->value != NULL)
+        {
+            entry_destroy(list->head->value);
+            free(list->head);
+        }
         list->head = next;
     }
+    free(list->head);
     free(list);
 }
 
@@ -56,6 +61,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
         free(new_node);
         return -1;
     }
+    new_node->next = NULL;
     new_node->value = entry;
 
     //Se a lista tiver vazia
@@ -71,13 +77,15 @@ int list_add(struct list_t *list, struct entry_t *entry)
     {
         if (entry_compare(entry, node->value) == 0)
         {
-            entry_replace(node->value, entry->key, entry->value);
+            entry_destroy(node->value);
+            node->value = entry;
+            free(new_node);
             return 0;
         }
 
         else if (node->next == NULL)
         {
-            node->next = node;
+            node->next = new_node;
             list->length++;
             return 0;
         }
@@ -108,6 +116,7 @@ int list_remove(struct list_t *list, char *key)
         entry_destroy(node->value);
         list->head = node->next;
         free(node);
+        list->length--;
         return 0;
     }
 
@@ -140,13 +149,16 @@ int list_remove(struct list_t *list, char *key)
 */
 struct entry_t *list_get(struct list_t *list, char *key)
 {
-    if(list == NULL)
+    if (list == NULL)
         return NULL;
 
     struct node_t *node = list->head;
-    while(node) {
-        if(strcmp(node->value->key, key) == 0)
+    while (node)
+    {
+        if (strcmp(node->value->key, key) == 0)
             return node->value;
+        if (node->next == NULL)
+            return NULL;
         node = node->next;
     }
 
@@ -156,7 +168,8 @@ struct entry_t *list_get(struct list_t *list, char *key)
 /* Função que retorna o tamanho (número de elementos (entries)) da lista,
  * ou -1 (erro).
  */
-int list_size(struct list_t *list) {
+int list_size(struct list_t *list)
+{
     return list->length;
 }
 
@@ -164,19 +177,22 @@ int list_size(struct list_t *list) {
  * tabela, colocando o último elemento do array com o valor NULL e
  * reservando toda a memória necessária.
  */
-char **list_get_keys(struct list_t *list) {
+char **list_get_keys(struct list_t *list)
+{
     return NULL;
 }
 
 /* Função que liberta a memória ocupada pelo array das keys da tabela,
  * obtido pela função list_get_keys.
  */
-void list_free_keys(char **keys) {
+void list_free_keys(char **keys)
+{
     return;
 }
 
 /* Função que imprime o conteúdo da lista para o terminal.
  */
-void list_print(struct list_t *list) {
+void list_print(struct list_t *list)
+{
     return;
 }

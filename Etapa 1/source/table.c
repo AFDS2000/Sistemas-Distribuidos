@@ -2,6 +2,7 @@
 #include "table-private.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Função para criar/inicializar uma nova tabela hash, com n
  * linhas (n = módulo da função hash)
@@ -9,12 +10,32 @@
  */
 struct table_t *table_create(int n)
 {
-    struct table_t *array[n];
+    struct table_t *table = malloc(sizeof(struct table_t));
+    table->size = n;
+    table->count = 0;
+    table->items = calloc(table->size, sizeof(struct list_t *));
+    for (int i = 0; i < table->size; i++)
+        table->items[i] = NULL;
+
+    return table;
 }
 
 /* Função para libertar toda a memória ocupada por uma tabela.
  */
-void table_destroy(struct table_t *table);
+void table_destroy(struct table_t *table)
+{
+    if (table == NULL)
+        return;
+    for (int i = 0; i < table->size; i++)
+    {
+        struct list_t *item = table->items[i];
+        if (item != NULL)
+            list_destroy(item);
+    }
+
+    free(table->items);
+    free(table);
+}
 
 /* Função para adicionar um par chave-valor à tabela.
  * Os dados de entrada desta função deverão ser copiados, ou seja, a
@@ -24,7 +45,27 @@ void table_destroy(struct table_t *table);
  * a necessária gestão da memória para armazenar os novos dados.
  * Retorna 0 (ok) ou -1 em caso de erro.
  */
-int table_put(struct table_t *table, char *key, struct data_t *value);
+int table_put(struct table_t *table, char *key, struct data_t *value)
+{
+    //Cópia dos dados
+    char *key_copy = malloc(strlen(key) + 1);
+    strcpy(key_copy, key);
+    struct data_t *data = data_dup(value);
+    if (data == NULL)
+        return -1;
+
+    struct entry_t *entry = entry_create(key_copy, data);
+    if (entry == NULL)
+        return -1;
+
+    //Adicionar na hash table
+    int i = hash(key);
+    int error = list_add(table->items[i], entry);
+    if (error == -1)
+        return error;
+
+    return 0;
+}
 
 /* Função para obter da tabela o valor associado à chave key.
  * A função deve devolver uma cópia dos dados que terão de ser
@@ -35,28 +76,47 @@ int table_put(struct table_t *table, char *key, struct data_t *value);
  * a função.
  * Devolve NULL em caso de erro.
  */
-struct data_t *table_get(struct table_t *table, char *key);
+struct data_t *table_get(struct table_t *table, char *key)
+{
+    int i = hash(key);
+    return;
+}
 
 /* Função para remover um elemento da tabela, indicado pela chave key, 
  * libertando toda a memória alocada na respetiva operação table_put.
  * Retorna 0 (ok) ou -1 (key not found).
  */
-int table_del(struct table_t *table, char *key);
+int table_del(struct table_t *table, char *key)
+{
+    return 0;
+}
 
 /* Função que devolve o número de elementos contidos na tabela.
  */
-int table_size(struct table_t *table);
+int table_size(struct table_t *table)
+{
+    return table->count;
+}
 
 /* Função que devolve um array de char* com a cópia de todas as keys da
  * tabela, colocando o último elemento do array com o valor NULL e
  * reservando toda a memória necessária.
  */
-char **table_get_keys(struct table_t *table);
+char **table_get_keys(struct table_t *table)
+{
+    return;
+}
 
 /* Função que liberta toda a memória alocada por table_get_keys().
  */
-void table_free_keys(char **keys);
+void table_free_keys(char **keys)
+{
+    return;
+}
 
 /* Função que imprime o conteúdo da tabela.
  */
-void table_print(struct table_t *table);
+void table_print(struct table_t *table)
+{
+    return;
+}

@@ -157,8 +157,6 @@ struct entry_t *list_get(struct list_t *list, char *key)
     {
         if (strcmp(node->value->key, key) == 0)
             return node->value;
-        if (node->next == NULL)
-            return NULL;
         node = node->next;
     }
 

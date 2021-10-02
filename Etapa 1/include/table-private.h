@@ -3,13 +3,14 @@
 
 #include "list.h"
 
-struct table_t
-{
+struct table_t {
     int size;
-    struct table_element *list;
+    int count;
+    struct list_t **items;
 };
 
-struct table_element
-{
-    struct list_t *list;
-};
+//Função que calcula o hash da key passada por argumento
+int hash(char *key);
+
+#endif
+

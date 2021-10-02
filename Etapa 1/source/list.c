@@ -190,6 +190,7 @@ char **list_get_keys(struct list_t *list)
         node = node->next;
         i++;
     }
+    lista[i] = NULL;
 
     return lista;
 }
@@ -200,7 +201,7 @@ char **list_get_keys(struct list_t *list)
 void list_free_keys(char **keys)
 {
     int i = 0;
-    while (keys[i])
+    while (keys[i] != NULL)
     {
         free(keys[i]);
         i++;

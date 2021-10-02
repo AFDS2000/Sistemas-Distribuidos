@@ -179,16 +179,19 @@ int list_size(struct list_t *list)
  */
 char **list_get_keys(struct list_t *list)
 {
-    struct node_t *node = list->head;
-    
-    while(node) {
-        char *key;
-        memcpy(key, node->value->key, sizeof(node->value->key) + 1);
+    char **lista = malloc(sizeof(char *) * (list->length + 1));
 
+    struct node_t *node = list->head;
+    int i = 0;
+    while (node)
+    {
+        lista[i] = malloc(sizeof(char) * (strlen(node->value->key) + 1));
+        memcpy(lista[i], node->value->key, (strlen(node->value->key) + 1));
         node = node->next;
+        i++;
     }
 
-    return NULL;
+    return lista;
 }
 
 /* Função que liberta a memória ocupada pelo array das keys da tabela,
@@ -196,6 +199,13 @@ char **list_get_keys(struct list_t *list)
  */
 void list_free_keys(char **keys)
 {
+    int i = 0;
+    while (keys[i])
+    {
+        free(keys[i]);
+        i++;
+    }
+    free(keys);
     return;
 }
 
@@ -203,5 +213,13 @@ void list_free_keys(char **keys)
  */
 void list_print(struct list_t *list)
 {
-    return;
+    struct node_t *node = list->head;
+    while (node)
+    {
+        char *key = node->value->key;
+        struct data_t *data = node->value->value;
+        printf("\n-----------------------------------------------\nkey: %s \ndatasize: %d \ndata: %s", key, data->datasize, (char *)data->data);
+        node = node->next;
+    }
+    printf("\n-----------------------------------------------\n");
 }

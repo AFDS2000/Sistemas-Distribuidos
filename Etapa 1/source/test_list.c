@@ -126,12 +126,11 @@ int testGetKeys()
 
 	result = strcmp(keys[0], e1->key) == 0 && keys[0] != e1->key &&
 			 strcmp(keys[1], e2->key) == 0 && keys[1] != e2->key &&
-			 strcmp(keys[2], e3->key) == 0 && keys[2] != e3->key &&
-			 keys[3] == NULL;
+			 strcmp(keys[2], e3->key) == 0 && keys[2] != e3->key && keys[3] == NULL;
 
 	list_free_keys(keys);
 
-	//list_destroy(list);
+	list_destroy(list);
 
 	printf("\n list - testGetKeys: %s\n", result ? "passou" : "não passou");
 	return result;
@@ -144,7 +143,7 @@ int testInsereMesmaKey()
 	int result;
 	struct list_t *list = list_create();
 
-	struct entry_t *e1 = entry_create(strdup("abc"), data_create(5)),
+	struct entry_t *e1 = entry_create(strdup("abc"), data_create2(6, strdup("lindo"))),
 				   *e2 = entry_create(strdup("def"), data_create(5)),
 				   *e3 = entry_create(strdup("abc"), data_create(5)),
 				   *e4 = entry_create(strdup("abc"), data_create(5)),
@@ -174,7 +173,7 @@ int testInsereMesmaKey()
 
 	result = result && list_get(list, "ghi") == e5 &&
 			 list_get(list, "def") == e6;
-
+	list_print(list);
 	list_destroy(list);
 
 	printf("list - testInsereMesmaKey: %s\n", result ? "passou" : "não passou");

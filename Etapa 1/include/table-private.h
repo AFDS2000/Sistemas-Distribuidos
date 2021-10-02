@@ -3,9 +3,13 @@
 
 #include "list.h"
 
-struct table_t {
-
+struct table_t
+{
+    int size;
+    struct table_element *list;
 };
 
-
-#endif
+struct table_element
+{
+    struct list_t *list;
+};

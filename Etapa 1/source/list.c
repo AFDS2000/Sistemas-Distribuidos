@@ -179,6 +179,15 @@ int list_size(struct list_t *list)
  */
 char **list_get_keys(struct list_t *list)
 {
+    struct node_t *node = list->head;
+    
+    while(node) {
+        char *key;
+        memcpy(key, node->value->key, sizeof(node->value->key) + 1);
+
+        node = node->next;
+    }
+
     return NULL;
 }
 

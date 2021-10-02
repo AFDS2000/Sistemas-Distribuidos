@@ -1,4 +1,5 @@
 #include "table.h"
+#include "table-private.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,7 +7,10 @@
  * linhas (n = módulo da função hash)
  * Em caso de erro retorna NULL.
  */
-struct table_t *table_create(int n);
+struct table_t *table_create(int n)
+{
+    struct table_t *array[n];
+}
 
 /* Função para libertar toda a memória ocupada por uma tabela.
  */

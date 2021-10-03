@@ -243,7 +243,7 @@ int main() {
 
 	score += testTabelaVazia();
 
-	//score += testPutInexistente();
+	score += testPutInexistente();
 
 	//score += testPutExistente();
 

@@ -13,7 +13,7 @@ struct table_t *table_create(int n)
     struct table_t *table = malloc(sizeof(struct table_t));
     table->size = n;
     table->count = 0;
-    table->items = calloc(table->size, sizeof(struct list_t *));
+    table->items = (struct list_t **) calloc(table->size, sizeof(struct list_t *));
     for (int i = 0; i < table->size; i++)
         table->items[i] = NULL;
 
@@ -60,10 +60,20 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
 
     //Adicionar na hash table
     int i = hash(key);
-    int error = list_add(table->items[i], entry);
+    struct list_t *lista;
+    if(table->items[762] != NULL) {
+        lista = table->items[762];
+        list_print(table->items[762]);
+    }
+
+    if(table->items[i] == NULL)
+        table->items[i] = list_create();
+    struct list_t *list = table->items[i];
+    int error = list_add(list, entry);
     if (error == -1)
         return error;
 
+    table->count++;
     return 0;
 }
 
@@ -79,7 +89,8 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
 struct data_t *table_get(struct table_t *table, char *key)
 {
     int i = hash(key);
-    return;
+    struct entry_t *entry = list_get(table->items[i], key);
+    return data_dup(entry->value);
 }
 
 /* Função para remover um elemento da tabela, indicado pela chave key, 

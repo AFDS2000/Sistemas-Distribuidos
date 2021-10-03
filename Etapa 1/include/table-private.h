@@ -10,7 +10,7 @@ struct table_t {
 };
 
 //Função que calcula o hash da key passada por argumento
-int hash(char *key);
+int hash(char *key, int n);
 
 #endif
 

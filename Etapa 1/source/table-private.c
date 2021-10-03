@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int hash(char *key)
+int hash(char *key, int n)
 {
     int length = strlen(key);
     int result = 0, i = 0;
@@ -13,5 +13,5 @@ int hash(char *key)
         i++;
     }
 
-    return result;
+    return result % n;
 }

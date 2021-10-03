@@ -138,7 +138,7 @@ int list_remove(struct list_t *list, char *key)
         }
     }
 
-    return 0;
+    return -1;
 }
 
 /* Função que obtém da lista a entry com a chave key.

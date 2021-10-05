@@ -6,17 +6,19 @@ test_data_objects = data.o test_data.o
 test_entry_objects = data.o entry.o test_entry.o
 test_list_objects = data.o entry.o list.o test_list.o
 test_table_objects = data.o entry.o list.o table.o table-private.o test_table.o
+test_serialization_objects = data.o entry.o serialization.o test_serialization.o
 
 data.o = data.h
 entry.o = data.h entry.h
 list.o = data.h entry.h list.h list-private.h
 table.o = data.h entry.h list.h list-private.h table.h table-private.h
 table-private.o = table-private.h 
+serialization.o = data.h entry.h serialization.h
 test_data.o = data.h
 test_entry.o = data.h entry.h
 test_list.o = data.h entry.h list.h list-private.h
 test_table.o = data.h entry.h list.h list-private.h table.h table-private.h
-
+test_serialization = data.h entry.h serialization.h
 
 CC = gcc -g
 CFLAGS = -Wall -lrt -lpthread
@@ -38,6 +40,9 @@ test_list: $(test_list_objects)
 test_table: $(test_table_objects)
 	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_table_objects)) -o $(BIN_dir)/test_table
 
+test_serialization: $(test_serialization_objects)
+	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_serialization_objects)) -o $(BIN_dir)/test_serialization
+
 test_data_debug:
 	valgrind --leak-check=full ./binary/test_data
 
@@ -49,6 +54,9 @@ test_list_debug:
 
 test_table_debug:
 	valgrind --leak-check=full ./binary/test_table
+
+test_serialization_debug:
+	valgrind --leak-check=full ./binary/test_serialization
 
 clean:
 	rm -f $(OBJ_dir)/*.o

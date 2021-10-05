@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/binary/test_table",
+            "program": "${workspaceFolder}/binary/test_serialization",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

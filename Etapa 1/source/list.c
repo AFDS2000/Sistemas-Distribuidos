@@ -13,12 +13,9 @@ struct list_t *list_create()
 {
     struct list_t *list = malloc(sizeof(struct list_t));
     if (list == NULL)
-    {
-        free(list);
         return NULL;
-    }
-    list->head = NULL;
 
+    list->head = NULL;
     list->length = 0;
     return list;
 }
@@ -28,18 +25,20 @@ struct list_t *list_create()
  */
 void list_destroy(struct list_t *list)
 {
-    while (list->head)
+    if (list)
     {
-        struct node_t *next = list->head->next;
-        if (list->head->value != NULL)
+        while (list->head)
         {
-            entry_destroy(list->head->value);
-            free(list->head);
+            struct node_t *next = list->head->next;
+            if (list->head->value != NULL)
+            {
+                entry_destroy(list->head->value);
+                free(list->head);
+            }
+            list->head = next;
         }
-        list->head = next;
+        free(list);
     }
-    free(list->head);
-    free(list);
 }
 
 /* Função que adiciona no final da lista (tail) a entry passada como
@@ -52,15 +51,13 @@ void list_destroy(struct list_t *list)
 
 int list_add(struct list_t *list, struct entry_t *entry)
 {
-    if (list == NULL)
+    if (list == NULL || entry == NULL)
         return -1;
 
     struct node_t *new_node = malloc(sizeof(struct node_t));
     if (new_node == NULL)
-    {
-        free(new_node);
         return -1;
-    }
+    
     new_node->next = NULL;
     new_node->value = entry;
 
@@ -92,8 +89,6 @@ int list_add(struct list_t *list, struct entry_t *entry)
         else
             node = node->next;
     }
-
-    return 0;
 }
 
 /* Função que elimina da lista a entry com a chave key.
@@ -101,7 +96,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
  */
 int list_remove(struct list_t *list, char *key)
 {
-    if (list == NULL)
+    if (list == NULL || key == NULL)
         return -1;
 
     //Se a lista tiver vazia
@@ -149,7 +144,7 @@ int list_remove(struct list_t *list, char *key)
 */
 struct entry_t *list_get(struct list_t *list, char *key)
 {
-    if (list == NULL)
+    if (list == NULL || key == NULL)
         return NULL;
 
     struct node_t *node = list->head;
@@ -168,7 +163,7 @@ struct entry_t *list_get(struct list_t *list, char *key)
  */
 int list_size(struct list_t *list)
 {
-    return list->length;
+    return list ? list->length : -1;
 }
 
 /* Função que devolve um array de char* com a cópia de todas as keys da 
@@ -177,19 +172,22 @@ int list_size(struct list_t *list)
  */
 char **list_get_keys(struct list_t *list)
 {
+    if (list == NULL)
+        return NULL;
+
     char **lista = malloc(sizeof(char *) * (list->length + 1));
 
     struct node_t *node = list->head;
     int i = 0;
     while (node)
     {
-        lista[i] = malloc(sizeof(char) * (strlen(node->value->key) + 1));
-        memcpy(lista[i], node->value->key, (strlen(node->value->key) + 1));
+        int size_key = strlen(node->value->key) + 1;
+        lista[i] = malloc(size_key);
+        memcpy(lista[i], node->value->key, size_key);
         node = node->next;
         i++;
     }
     lista[i] = NULL;
-
     return lista;
 }
 
@@ -198,6 +196,9 @@ char **list_get_keys(struct list_t *list)
  */
 void list_free_keys(char **keys)
 {
+    if (keys == NULL)
+        return;
+
     int i = 0;
     while (keys[i] != NULL)
     {
@@ -212,13 +213,16 @@ void list_free_keys(char **keys)
  */
 void list_print(struct list_t *list)
 {
+    if (list == NULL)
+        return;
+
     struct node_t *node = list->head;
     while (node)
     {
         char *key = node->value->key;
         struct data_t *data = node->value->value;
-        printf("\n-----------------------------------------------\nkey: %s \ndatasize: %d \ndata: %s", key, data->datasize, (char *)data->data);
+        printf("\n-----------------------\nkey: %s \ndatasize: %d \ndata: %s", key, data->datasize, (char *)data->data);
         node = node->next;
     }
-    printf("\n-----------------------------------------------\n");
+    printf("\n-----------------------\n");
 }

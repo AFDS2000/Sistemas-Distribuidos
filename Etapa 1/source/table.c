@@ -10,10 +10,14 @@
  */
 struct table_t *table_create(int n)
 {
+    if(n <= 0)
+        return NULL;
+    
     struct table_t *table = malloc(sizeof(struct table_t));
     table->size = n;
     table->count = 0;
-    table->items = (struct list_t **)calloc(table->size, sizeof(struct list_t *));
+    table->items = (struct list_t **) calloc(table->size, sizeof(struct list_t *));
+    
     for (int i = 0; i < table->size; i++)
         table->items[i] = NULL;
 
@@ -26,6 +30,7 @@ void table_destroy(struct table_t *table)
 {
     if (table == NULL)
         return;
+
     for (int i = 0; i < table->size; i++)
     {
         struct list_t *item = table->items[i];
@@ -47,6 +52,9 @@ void table_destroy(struct table_t *table)
  */
 int table_put(struct table_t *table, char *key, struct data_t *value)
 {
+    if (table == NULL || key == NULL || value == NULL)
+        return -1;
+
     //Cópia dos dados
     char *key_copy = malloc(strlen(key) + 1);
     strcpy(key_copy, key);
@@ -59,16 +67,15 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
     if (entry == NULL)
         return -1;
 
-    //Adicionar na hash table
+    //Adicionar os dados na hash table
     int i = hash(key, table->size);
     struct entry_t *entry2 = list_get(table->items[i], key_copy);
 
     if (table->items[i] == NULL)
         table->items[i] = list_create();
 
-    int error = list_add(table->items[i], entry);
-    if (error == -1)
-        return error;
+    if (list_add(table->items[i], entry) == -1)
+        return -1;
 
     //Verificar se já existia na lista
     if (entry2 == NULL)
@@ -87,6 +94,9 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
  */
 struct data_t *table_get(struct table_t *table, char *key)
 {
+    if (table == NULL || key == NULL)
+        return NULL;
+
     int i = hash(key, table->size);
     struct entry_t *entry = list_get(table->items[i], key);
     if (entry == NULL)
@@ -101,11 +111,12 @@ struct data_t *table_get(struct table_t *table, char *key)
  */
 int table_del(struct table_t *table, char *key)
 {
-    int i = hash(key, table->size);
-    int error = list_remove(table->items[i], key);
+    if(table == NULL || key == NULL)
+        return -1;
 
-    if (error == -1)
-        return error;
+    int i = hash(key, table->size);
+    if (list_remove(table->items[i], key) == -1)
+        return -1;
 
     table->count--;
     return 0;
@@ -115,7 +126,7 @@ int table_del(struct table_t *table, char *key)
  */
 int table_size(struct table_t *table)
 {
-    return table->count;
+    return table ? table->count : -1;
 }
 
 /* Função que devolve um array de char* com a cópia de todas as keys da
@@ -124,6 +135,9 @@ int table_size(struct table_t *table)
  */
 char **table_get_keys(struct table_t *table)
 {
+    if (table == NULL)
+        return NULL;
+
     int counter = 0;
     char **tableKeys = malloc(sizeof(char *) * (table->count + 1));
 
@@ -148,6 +162,9 @@ char **table_get_keys(struct table_t *table)
  */
 void table_free_keys(char **keys)
 {
+    if (keys == NULL)
+        return;
+    
     int i = 0;
     while (keys[i] != NULL)
     {
@@ -162,5 +179,14 @@ void table_free_keys(char **keys)
  */
 void table_print(struct table_t *table)
 {
+    if (table == NULL)
+        return;
+    
+    for (int i = 0; i < table->size; i++)
+    {
+        printf("Index of table: %d\nList:", i);
+        list_print(table->items[i]);
+        printf("--------------------------------------------------------------------\n");
+    }
     return;
 }

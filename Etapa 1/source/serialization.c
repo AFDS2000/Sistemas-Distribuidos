@@ -12,9 +12,8 @@
 int data_to_buffer(struct data_t *data, char **data_buf)
 {
     if (data == NULL || data_buf == NULL)
-    {
         return -1;
-    }
+    
     char *buff = malloc(sizeof(int) + data->datasize);
 
     memcpy(buff, &data->datasize, sizeof(int));
@@ -32,16 +31,13 @@ int data_to_buffer(struct data_t *data, char **data_buf)
 struct data_t *buffer_to_data(char *data_buf, int data_buf_size)
 {
     if (data_buf_size <= 0 || data_buf == NULL)
-    {
         return NULL;
-    }
 
     int tamanho = 0;
     memcpy(&tamanho, data_buf, sizeof(int));
     struct data_t *data = data_create(tamanho);
 
     memcpy(data->data, data_buf + sizeof(int), tamanho); // copiar data de forma a ter um objeto diferente para evitar conflitos nos frees
-
     return data;
 }
 
@@ -52,12 +48,12 @@ struct data_t *buffer_to_data(char *data_buf, int data_buf_size)
 int entry_to_buffer(struct entry_t *data, char **entry_buf)
 {
     if (data == NULL || entry_buf == NULL)
-    {
         return -1;
-    }
+
     int size = sizeof(int) + strlen(data->key) + 1 + sizeof(int) + data->value->datasize;
     int size_key = strlen(data->key) + 1;
     char *buff = malloc(size);
+    
     //converter data para serial
     char *data_buf;
     int data_buf_size = data_to_buffer(data->value, &data_buf);
@@ -80,9 +76,8 @@ int entry_to_buffer(struct entry_t *data, char **entry_buf)
 struct entry_t *buffer_to_entry(char *entry_buf, int entry_buf_size)
 {
     if (entry_buf_size <= 0 || entry_buf == NULL)
-    {
         return NULL;
-    }
+    
     int key_size = 0;
     memcpy(&key_size, entry_buf, sizeof(int));
 
@@ -93,8 +88,6 @@ struct entry_t *buffer_to_entry(char *entry_buf, int entry_buf_size)
     memcpy(&data_buffer_size, entry_buf + sizeof(int) + key_size, sizeof(int));
 
     struct data_t *data = buffer_to_data(entry_buf + (sizeof(int) + key_size), data_buffer_size);
-
     struct entry_t *entry = entry_create(key, data);
-
     return entry;
 }

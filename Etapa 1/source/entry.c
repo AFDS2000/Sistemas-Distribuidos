@@ -9,17 +9,13 @@
  */
 struct entry_t *entry_create(char *key, struct data_t *data)
 {
-
     if (key == NULL || data == NULL)
         return NULL;
 
-    struct entry_t *entry = (struct entry_t *)malloc(sizeof(struct entry_t));
+    struct entry_t *entry = malloc(sizeof(struct entry_t));
 
     if (entry == NULL)
-    {
-        free(entry);
         return NULL;
-    }
 
     entry->key = key;
     entry->value = data;
@@ -31,19 +27,19 @@ struct entry_t *entry_create(char *key, struct data_t *data)
  */
 void entry_initialize(struct entry_t *entry)
 {
-    entry_create(entry->key, NULL);
+    if (entry && entry->key)
+        entry_create(entry->key, NULL);
 }
 
 /* Função que elimina uma entry, libertando a memória por ela ocupada
  */
 void entry_destroy(struct entry_t *entry)
 {
-
-    if (entry != NULL)
+    if (entry)
     {
-        if (entry->value != NULL)
+        if (entry->value)
             data_destroy(entry->value);
-        if (entry->key != NULL)
+        if (entry->key)
             free(entry->key);
         free(entry);
     }
@@ -54,15 +50,14 @@ void entry_destroy(struct entry_t *entry)
  */
 struct entry_t *entry_dup(struct entry_t *entry)
 {
-
-    struct entry_t *entry_dup2 = entry_create(strdup(entry->key), data_dup(entry->value));
-
-    if (entry_dup2 == NULL)
+    if (entry && entry->key && entry->value)
     {
-        free(entry_dup2);
-        return NULL;
+        struct entry_t *entry_dup = entry_create(strdup(entry->key), data_dup(entry->value));
+
+        if (entry_dup == NULL)
+            return NULL;
+        return entry_dup;
     }
-    return entry_dup2;
 }
 
 /* Função que substitui o conteúdo de uma entrada entry_t.
@@ -70,8 +65,7 @@ struct entry_t *entry_dup(struct entry_t *entry)
 */
 void entry_replace(struct entry_t *entry, char *new_key, struct data_t *new_value)
 {
-
-    if (entry != NULL)
+    if (entry)
     {
         data_destroy(entry->value);
         free(entry->key);

@@ -1,3 +1,8 @@
+# Grupo 31 \
+  André Cabaço 53457 \
+  André Seixas 53870 \
+  Miguel Agostinho 53475 \
+
 SRC_dir	= source
 OBJ_dir	= object
 BIN_dir = binary
@@ -20,13 +25,15 @@ test_list.o = data.h entry.h list.h list-private.h
 test_table.o = data.h entry.h list.h list-private.h table.h table-private.h
 test_serialization = data.h entry.h serialization.h
 
-CC = gcc -g
-CFLAGS = -Wall -lrt -lpthread
+CC = gcc
+CFLAGS = -Wall -g
 
 vpath %.o $(OBJ_dir)
 
 %.o: $(SRC_dir)/%.c $($@)
 	$(CC) -I include -o $(OBJ_dir)/$@ -c $<
+
+all: test_data test_entry test_list test_table test_serialization
 
 test_data: $(test_data_objects)
 	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_data_objects)) -o $(BIN_dir)/test_data 
@@ -42,21 +49,6 @@ test_table: $(test_table_objects)
 
 test_serialization: $(test_serialization_objects)
 	$(CC) $(CFLAGS) $(addprefix $(OBJ_dir)/,$(test_serialization_objects)) -o $(BIN_dir)/test_serialization
-
-test_data_debug:
-	valgrind --leak-check=full ./binary/test_data
-
-test_entry_debug:
-	valgrind --leak-check=full ./binary/test_entry
-
-test_list_debug:
-	valgrind --leak-check=full ./binary/test_list
-
-test_table_debug:
-	valgrind --leak-check=full ./binary/test_table
-
-test_serialization_debug:
-	valgrind --leak-check=full ./binary/test_serialization
 
 clean:
 	rm -f $(OBJ_dir)/*.o

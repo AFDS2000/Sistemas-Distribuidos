@@ -21,6 +21,9 @@ struct table_t *table_create(int n)
         return NULL;
     
     struct table_t *table = malloc(sizeof(struct table_t));
+    if(table == NULL)
+        return NULL;
+    
     table->size = n;
     table->count = 0;
     table->items = (struct list_t **) calloc(table->size, sizeof(struct list_t *));

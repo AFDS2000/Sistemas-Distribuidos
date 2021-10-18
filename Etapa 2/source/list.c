@@ -95,6 +95,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
         else
             node = node->next;
     }
+    return -1;
 }
 
 /* Função que elimina da lista a entry com a chave key.

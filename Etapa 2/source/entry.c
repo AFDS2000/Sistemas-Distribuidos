@@ -64,6 +64,8 @@ struct entry_t *entry_dup(struct entry_t *entry)
         if (entry_dup == NULL)
             return NULL;
         return entry_dup;
+    } else {
+        return NULL;
     }
 }
 

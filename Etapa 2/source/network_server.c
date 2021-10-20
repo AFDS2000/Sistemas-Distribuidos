@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "network_server.h"
+#include "inet.h"
 
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.

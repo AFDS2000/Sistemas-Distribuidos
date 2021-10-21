@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "table_skel.h"
+#include "table_skel-private.h"
 
 static struct table_t *table;
 
@@ -27,5 +28,34 @@ void table_skel_destroy() {
  * Retorna 0 (OK) ou -1 (erro, por exemplo, tabela nao incializada)
 */
 int invoke(MessageT *msg) {
+    if(table == NULL)
+        return -1;
+    
+    switch (msg->opcode)
+    {
+    case 10:
+        get_table_size(msg, table);
+        break;
+    case 20:
+        del_entry(msg, table);
+        break;
+    case 30:
+        get_entry(msg, table);
+        break;
+    case 40:
+        put_entry(msg, table);
+        break;
+    case 50:
+        get_keys(msg, table);
+        break;
+    case 60:
+        table_to_string(msg, table);
+        break;
+    default:
+        msg->opcode = 99;
+        msg->c_type = 70;
+        msg->data = NULL;
+        msg->data_size = 0;
+    }
     return 0;
 }

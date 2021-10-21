@@ -19,4 +19,3 @@ struct table_t {
 int hash(char *key, int n);
 
 #endif
-

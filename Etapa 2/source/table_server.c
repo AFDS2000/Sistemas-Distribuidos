@@ -6,7 +6,8 @@
 
 int main(int argc, char const *argv[])
 {
-    if(argc < 3) {
+    if (argc < 3)
+    {
         printf("Erro na execução\n");
         printf("Execução do programa: ./<path_to_exe>/table.server <port> <n_lists>\n");
         return -1;
@@ -23,7 +24,7 @@ int main(int argc, char const *argv[])
     err = table_skel_init(n_lists);
     if (err != 0)
         return err;
-    
+
     //destroir a table
     table_skel_destroy();
     return 0;

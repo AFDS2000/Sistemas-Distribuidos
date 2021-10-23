@@ -9,7 +9,7 @@ BIN_DIR = binary
 PROTOC_DIR = /usr/local/
 
 #client
-table_client_objects = table_client.o table-lib.o
+table_client_objects = table_client.o client_stub.o network_client.o sdmessage.pb-c.o
 
 #server
 table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o table_skel.o sdmessage.pb-c.o
@@ -19,9 +19,10 @@ entry.o = data.h entry.h
 list.o = data.h entry.h list.h list-private.h
 table.o = data.h entry.h list.h list-private.h table.h table-private.h
 table-private.o = table-private.h 
-table_client.o =
-client_stub.o = 
-network_client.o = 
+table_client.o = data.h client_stub.h
+client_stub.o = client_stub.h client_stub-private.h sdmessage.pb-c.h
+network_client.o = network_client.h client_stub-private.h
+
 table_server.o = data.h entry.h list.h list-private.h table.h table-private.h table_server.h table_skel.h sdmessage.pb-c.h
 table_skel.o = data.h entry.h list.h list-private.h table.h table-private.h table_skel.h sdmessage.pb-c.h
 network_server.o = network_server.h table_skel.h
@@ -46,9 +47,9 @@ vpath %.o $(OBJ_DIR)
 
 #library
 client-lib.o:
-	ld -r (objetos que estao no pdf) -o client-lib.o
+	ld -r client_stub.o -o client-lib.o
 
-all: table_client table_server
+all: table_client #table_server
 
 table-client: $(table_client_objects)
 	$(CC) $(addprefix $(OBJ_DIR)/,$(table_client_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@

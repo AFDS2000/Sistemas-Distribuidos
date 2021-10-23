@@ -14,4 +14,12 @@ void get_table_size(MessageT *msg, struct table_t *table);
 
 void del_entry(MessageT *msg, struct table_t *table);
 
+void get_entry(MessageT *msg, struct table_t *table);
+
+void put_entry(MessageT *msg, struct table_t *table);
+
+void get_keys(MessageT *msg, struct table_t *table);
+
+void table_to_string(MessageT *msg, struct table_t *table);
+
 #endif

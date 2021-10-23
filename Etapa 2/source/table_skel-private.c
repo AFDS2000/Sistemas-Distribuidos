@@ -30,7 +30,6 @@ void get_table_size(MessageT *msg, struct table_t *table)
 
     sprintf(msg->data, "%d", size);
     msg->data_size = strlen(msg->data) + 1;
-    return 0;
 }
 
 void del_entry(MessageT *msg, struct table_t *table)
@@ -73,15 +72,15 @@ void get_entry(MessageT *msg, struct table_t *table)
     }
 }
 
-void put_entry(msg, table) {
-
+void put_entry(MessageT *msg, struct table_t *table)
+{
 }
 
-void get_keys(msg, table) {
-    char **keys = table_get_keys(table);
-
+void get_keys(MessageT *msg, struct table_t *table)
+{
+    //char **keys = table_get_keys(table);
 }
 
-void table_to_string(msg, table) {
-    
+void table_to_string(MessageT *msg, struct table_t *table)
+{
 }

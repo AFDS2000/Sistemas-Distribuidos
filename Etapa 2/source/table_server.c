@@ -3,7 +3,6 @@
 
 #include "table_skel.h"
 #include "network_server.h"
-#include "sdmessage.pb-c.h"
 
 int main(int argc, char const *argv[])
 {
@@ -21,24 +20,20 @@ int main(int argc, char const *argv[])
 
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 
-    // err = network_server_init(port);
+    int listening_socket = network_server_init(port);
+    if (listening_socket < 0) {
+        return -1;
+    }
 
     // inicializar a table
     err = table_skel_init(n_lists);
-    if (err != 0)
+    if (err < 0)
         return err;
-
-    MessageT msg;
-    message_t__init(&msg);
-
-    msg.opcode = 10;
-    msg.data = NULL;
-    invoke(&msg);
-
-    printf("data: %d : %s\n", msg.data_size, msg.data);
+        
+    network_main_loop(listening_socket);
 
     // destroir a table
     table_skel_destroy();
-    free(msg.data);
+
     return 0;
 }

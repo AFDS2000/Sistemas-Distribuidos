@@ -12,7 +12,7 @@ PROTOC_DIR = /usr/local/
 table_client_objects = table_client.o client_stub.o network_client.o sdmessage.pb-c.o
 
 #server
-table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o table_skel.o sdmessage.pb-c.o
+table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o network_server.o table_skel.o table_skel-private.o sdmessage.pb-c.o
 
 data.o = data.h
 entry.o = data.h entry.h
@@ -23,9 +23,10 @@ table_client.o = data.h client_stub.h
 client_stub.o = client_stub.h client_stub-private.h sdmessage.pb-c.h
 network_client.o = network_client.h client_stub-private.h
 
-table_server.o = data.h entry.h list.h list-private.h table.h table-private.h table_server.h table_skel.h sdmessage.pb-c.h
+table_server.o = data.h entry.h list.h list-private.h table.h table-private.h table_server.h table_skel.h table_skel.private.h
 table_skel.o = data.h entry.h list.h list-private.h table.h table-private.h table_skel.h sdmessage.pb-c.h
-network_server.o = network_server.h table_skel.h
+table_skel-private.o = data.h entry.h list.h list-private.h table.h table-private.h table_skel.h table_skel-private.h sdmessage.pb-c.h
+network_server.o = network_server.h table_skel.h inet.h
 sdmessage.pb-c.o = sdmessage.pb-c.h
 
 CC = gcc

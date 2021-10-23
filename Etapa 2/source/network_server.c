@@ -2,12 +2,42 @@
 #include <stdlib.h>
 
 #include "network_server.h"
+#include "table_skel.h"
+#include "inet.h"
+
+static struct sockaddr_in server;
 
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
  * Retornar descritor do socket (OK) ou -1 (erro).
  */
-int network_server_init(short port);
+int network_server_init(short port)
+{
+    int sockfd;
+
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        return -1;
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(port);
+    server.sin_addr.s_addr = htons(INADDR_ANY);
+
+    // bind
+    if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
+    {
+        close(sockfd);
+        return -1;
+    }
+
+    // listen
+    if (listen(sockfd, 0) < 0)
+    {
+        close(sockfd);
+        return -1;
+    }
+
+    return sockfd;
+}
 
 /* Esta função deve:
  * - Aceitar uma conexão de um cliente;
@@ -16,23 +46,75 @@ int network_server_init(short port);
  * - Esperar a resposta do skeleton;
  * - Enviar a resposta ao cliente usando a função network_send.
  */
-int network_main_loop(int listening_socket);
+int network_main_loop(int listening_socket)
+{
+    int connsockfd;
+    int nbytes, count;
+    int client;
+    socklen_t size_client;
+    char str[MAX_MSG+1];
+
+    printf("À espera de receber conection\n");
+
+    // accept bloqueia à espera de pedidos de conexão.
+    // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
+    // socket pronta a comunicar com o cliente.
+    while ((connsockfd = accept(listening_socket,(struct sockaddr *) &client, &size_client)) != -1) {
+
+        printf("Conection accept\n");
+        //primeiro read é para receber o size
+        if((nbytes = read(connsockfd,str,MAX_MSG)) < 0){
+			perror("Erro ao receber dados do cliente");
+			close(connsockfd);
+			continue;
+		}
+
+        // Coloca terminador de string
+		str[nbytes] = '\0';
+
+        count = strlen(str);
+
+        //segundo read é para receber msg
+
+        //primeiro write é para enviar o size
+        if((nbytes = write(connsockfd,str,count)) != count){
+			perror("Erro ao enviar resposta ao cliente");
+			close(connsockfd);
+			continue;
+		}
+
+        //segundo write é para enviar a msg
+
+		// Fecha socket referente a esta conexão
+		close(connsockfd);
+    }
+    // Fecha socket
+    close(listening_socket);
+    return 0;
+}
 
 /* Esta função deve:
  * - Ler os bytes da rede, a partir do client_socket indicado;
  * - De-serializar estes bytes e construir a mensagem com o pedido,
  *   reservando a memória necessária para a estrutura MessageT.
  */
-MessageT *network_receive(int client_socket);
+MessageT *network_receive(int client_socket) {
+    return NULL;
+}
 
 /* Esta função deve:
  * - Serializar a mensagem de resposta contida em msg;
  * - Libertar a memória ocupada por esta mensagem;
  * - Enviar a mensagem serializada, através do client_socket.
  */
-int network_send(int client_socket, MessageT *msg);
+int network_send(int client_socket, MessageT *msg) {
+    return 0;
+}
 
 /* A função network_server_close() liberta os recursos alocados por
  * network_server_init().
  */
-int network_server_close();
+int network_server_close() {
+
+    return 0;
+}

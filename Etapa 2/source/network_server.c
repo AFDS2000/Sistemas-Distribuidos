@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "network_server.h"
+#include "sdmessage.pb-c.h"
+#include "message-private.h"
+#include "inet-private.h"
 #include "table_skel.h"
-#include "inet.h"
+#include "network_server.h"
 
 static struct sockaddr_in server;
 
@@ -14,7 +16,6 @@ static struct sockaddr_in server;
 int network_server_init(short port)
 {
     int sockfd;
-
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         return -1;
 
@@ -49,44 +50,44 @@ int network_server_init(short port)
 int network_main_loop(int listening_socket)
 {
     int connsockfd;
-    int nbytes, count;
+    // int nbytes, count;
     int client;
     socklen_t size_client;
-    char str[MAX_MSG+1];
 
-    printf("À espera de receber conection\n");
+    printf("Waiting conection\n");
 
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while ((connsockfd = accept(listening_socket,(struct sockaddr *) &client, &size_client)) != -1) {
-
+    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
+    {
         printf("Conection accept\n");
-        //primeiro read é para receber o size
-        if((nbytes = read(connsockfd,str,MAX_MSG)) < 0){
-			perror("Erro ao receber dados do cliente");
-			close(connsockfd);
-			continue;
-		}
 
-        // Coloca terminador de string
-		str[nbytes] = '\0';
+        /*primeiro read é para receber o size
+        int bufsize;
+        uint8_t *buf = malloc(sizeof(uint8_t));
+        if ((bufsize = read_all(connsockfd, buf, sizeof(uint8_t))) < 0) {
+            close(connsockfd);
+            continue;
+        }
 
-        count = strlen(str);
+        //Converter str em unsigned
+        unsigned len = *buf;
+        printf("Tamanho da mensagem: %d", len);
+        */
+        // segundo read é para receber msg
+        MessageT *msg;
+        if((msg = network_receive(connsockfd)) == NULL) {
+            close(connsockfd);
+            continue;
+        }
 
-        //segundo read é para receber msg
+        // primeiro write é para enviar o size
 
-        //primeiro write é para enviar o size
-        if((nbytes = write(connsockfd,str,count)) != count){
-			perror("Erro ao enviar resposta ao cliente");
-			close(connsockfd);
-			continue;
-		}
+        // segundo write é para enviar a msg
 
-        //segundo write é para enviar a msg
-
-		// Fecha socket referente a esta conexão
-		close(connsockfd);
+        // Fecha socket referente a esta conexão
+        close(connsockfd);
     }
     // Fecha socket
     close(listening_socket);
@@ -98,7 +99,16 @@ int network_main_loop(int listening_socket)
  * - De-serializar estes bytes e construir a mensagem com o pedido,
  *   reservando a memória necessária para a estrutura MessageT.
  */
-MessageT *network_receive(int client_socket) {
+MessageT *network_receive(int client_socket)
+{
+    MessageT *recv_msg = NULL;
+    int bufsize;
+    uint8_t *buf = malloc(sizeof(uint8_t));
+
+    if ((bufsize = read_all(client_socket, buf, sizeof(uint8_t))) < 0)
+    {
+        return NULL;
+    }
     return NULL;
 }
 
@@ -107,14 +117,16 @@ MessageT *network_receive(int client_socket) {
  * - Libertar a memória ocupada por esta mensagem;
  * - Enviar a mensagem serializada, através do client_socket.
  */
-int network_send(int client_socket, MessageT *msg) {
+int network_send(int client_socket, MessageT *msg)
+{
     return 0;
 }
 
 /* A função network_server_close() liberta os recursos alocados por
  * network_server_init().
  */
-int network_server_close() {
+int network_server_close()
+{
 
     return 0;
 }

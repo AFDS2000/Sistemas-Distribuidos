@@ -99,6 +99,7 @@ int rtable_size(struct rtable_t *rtable)
     msg.data_size = 0;
 
     len = message_t__get_packed_size(&msg);
+    printf("Tamanho: %d", len);
 
     buf = malloc(len);
     if (buf == NULL)

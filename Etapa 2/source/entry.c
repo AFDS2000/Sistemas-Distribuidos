@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include "entry.h"
-#include "data.h"
 
 /* Função que cria uma entry, reservando a memória necessária e
  * inicializando-a com a string e o bloco de dados passados.

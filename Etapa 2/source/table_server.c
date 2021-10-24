@@ -23,14 +23,19 @@ int main(int argc, char const *argv[])
     int listening_socket = network_server_init(port);
     if (listening_socket < 0)
     {
+        printf("Erro ao preprar o socket");
         return -1;
     }
 
     // inicializar a table
     err = table_skel_init(n_lists);
-    if (err < 0)
+    if (err < 0) {
+        printf("Erro ao criar a tabela");
+        network_server_close();
         return err;
 
+    }
+        
     network_main_loop(listening_socket);
 
     // destroir a table

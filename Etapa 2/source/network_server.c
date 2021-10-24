@@ -61,30 +61,47 @@ int network_main_loop(int listening_socket)
     // socket pronta a comunicar com o cliente.
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
+
         printf("Conection accept\n");
+        //primeiro read é para receber o size
+        int buffer_len_recv;
+        int d = read(connsockfd, &buffer_len_recv, sizeof(int)); // recebe o unsigned
+        int normal = ntohl(buffer_len_recv);
 
-        /*primeiro read é para receber o size
-        int bufsize;
-        uint8_t *buf = malloc(sizeof(uint8_t));
-        if ((bufsize = read_all(connsockfd, buf, sizeof(uint8_t))) < 0) {
-            close(connsockfd);
-            continue;
+        MessageT *recv_msg;
+        uint8_t *recv_buf = malloc(normal);
+
+        int b = read_all(connsockfd, recv_buf, normal);
+        recv_msg = message_t__unpack(NULL, normal, recv_buf); // ler msg
+
+        // envio
+
+        unsigned len;
+        MessageT msg;
+        uint8_t *buf = NULL;
+
+        message_t__init(&msg);
+        msg.opcode = 10;
+        msg.c_type = 70;
+        msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+        msg.data_size = 0;
+
+        len = message_t__get_packed_size(&msg);
+
+        buf = malloc(len);
+        if (buf == NULL)
+        {
+            fprintf(stdout, "malloc error\n");
+            return -1;
         }
+        message_t__pack(&msg, buf);
 
-        //Converter str em unsigned
-        unsigned len = *buf;
-        printf("Tamanho da mensagem: %d", len);
-        */
-        // segundo read é para receber msg
-        MessageT *msg;
-        if((msg = network_receive(connsockfd)) == NULL) {
-            close(connsockfd);
-            continue;
-        }
+        int buffer_len = htonl(len);
+        int unsig = write(connsockfd, &buffer_len, sizeof(buffer_len)); //enviar os len
 
-        // primeiro write é para enviar o size
+        int a = write_all(connsockfd, buf, len); // enviar msg
 
-        // segundo write é para enviar a msg
+        //segundo write é para enviar a msg
 
         // Fecha socket referente a esta conexão
         close(connsockfd);

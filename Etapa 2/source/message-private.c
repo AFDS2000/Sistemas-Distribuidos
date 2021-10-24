@@ -23,7 +23,8 @@ int write_all(int sock, uint8_t *buf, int len)
     return bufsize;
 }
 
-int read_all(int sock, uint8_t *buf, int len) {
+int read_all(int sock, uint8_t *buf, int len)
+{
     int bufsize = len;
     while (len > 0)
     {

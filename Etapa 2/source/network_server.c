@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "sdmessage.pb-c.h"
-#include "message-private.h"
-#include "inet-private.h"
 #include "table_skel.h"
 #include "network_server.h"
+#include "inet-private.h"
+#include "message-private.h"
 
 static struct sockaddr_in server;
 
@@ -50,7 +49,6 @@ int network_server_init(short port)
 int network_main_loop(int listening_socket)
 {
     int connsockfd;
-    // int nbytes, count;
     int client;
     socklen_t size_client;
 
@@ -61,47 +59,25 @@ int network_main_loop(int listening_socket)
     // socket pronta a comunicar com o cliente.
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
-
         printf("Conection accept\n");
-        //primeiro read é para receber o size
-        int buffer_len_recv;
-        int d = read(connsockfd, &buffer_len_recv, sizeof(int)); // recebe o unsigned
-        int normal = ntohl(buffer_len_recv);
 
-        MessageT *recv_msg;
-        uint8_t *recv_buf = malloc(normal);
-
-        int b = read_all(connsockfd, recv_buf, normal);
-        recv_msg = message_t__unpack(NULL, normal, recv_buf); // ler msg
-
-        // envio
-
-        unsigned len;
-        MessageT msg;
-        uint8_t *buf = NULL;
-
-        message_t__init(&msg);
-        msg.opcode = 10;
-        msg.c_type = 70;
-        msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
-        msg.data_size = 0;
-
-        len = message_t__get_packed_size(&msg);
-
-        buf = malloc(len);
-        if (buf == NULL)
+        MessageT *msg = network_receive(connsockfd);
+        if (msg == NULL)
         {
-            fprintf(stdout, "malloc error\n");
-            return -1;
+            close(connsockfd);
+            continue;
         }
-        message_t__pack(&msg, buf);
+        
+        if(invoke(msg) < 0) {
+            perror("Erro ao ler dados");
+            close(connsockfd);
+            continue;
+        }
 
-        int buffer_len = htonl(len);
-        int unsig = write(connsockfd, &buffer_len, sizeof(buffer_len)); //enviar os len
-
-        int a = write_all(connsockfd, buf, len); // enviar msg
-
-        //segundo write é para enviar a msg
+        if(network_send(connsockfd, msg) < 0) {
+            close(connsockfd);
+            continue;
+        }
 
         // Fecha socket referente a esta conexão
         close(connsockfd);
@@ -118,15 +94,26 @@ int network_main_loop(int listening_socket)
  */
 MessageT *network_receive(int client_socket)
 {
-    MessageT *recv_msg = NULL;
-    int bufsize;
-    uint8_t *buf = malloc(sizeof(uint8_t));
+    int buffer_len_recv;
 
-    if ((bufsize = read_all(client_socket, buf, sizeof(uint8_t))) < 0)
+    // Primeiro read recebe o unsigned len
+    if (read(client_socket, &buffer_len_recv, sizeof(int)) < 0)
+    {
+        perror("Erro ao receber dados do cliente");
+        return NULL;
+    }
+
+    buffer_len_recv = ntohl(buffer_len_recv);
+    uint8_t *recv_buf = malloc(buffer_len_recv);
+
+    //Segundo read para ler a msg serializada
+    if (read_all(client_socket, recv_buf, buffer_len_recv) < 0)
     {
         return NULL;
     }
-    return NULL;
+    MessageT *recv_msg = NULL;
+    recv_msg = message_t__unpack(NULL, buffer_len_recv, recv_buf); // de-serializar msg
+    return recv_msg;
 }
 
 /* Esta função deve:
@@ -136,6 +123,35 @@ MessageT *network_receive(int client_socket)
  */
 int network_send(int client_socket, MessageT *msg)
 {
+    unsigned len, buffer_len;
+    uint8_t *buf = NULL;
+
+    len = message_t__get_packed_size(msg);
+    buffer_len = htonl(len);
+
+    buf = malloc(len);
+    if (buf == NULL)
+    {
+        perror("malloc error\n");
+        return -1;
+    }
+
+    message_t__pack(msg, buf);
+
+    //envio do tamanho da msg
+    if(write(client_socket, &buffer_len, sizeof(buffer_len)) < 0) {
+        perror("Erro ao enviar dados para o cliente");
+        return -1;
+    }
+
+    //envio da msg
+    if(write_all(client_socket, buf, len) < 0) {
+        perror("Erro ao enviar dados para o cliente");
+        return -1;
+    }
+
+    //libertacao da memoria da msg
+    message_t__free_unpacked(msg, NULL);
     return 0;
 }
 

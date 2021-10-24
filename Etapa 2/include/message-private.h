@@ -1,5 +1,5 @@
-#ifndef _TABLE_SKEL_H
-#define _TABLE_SKEL_H
+#ifndef _MESSAGE_PRIVATE_H
+#define _MESSAGE_PRIVATE_H
 
 #include "inet-private.h"
 

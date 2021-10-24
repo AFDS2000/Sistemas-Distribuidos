@@ -24,9 +24,11 @@ void get_table_size(MessageT *msg, struct table_t *table)
     msg->c_type = 50;
 
     size = table_size(table);
+    count = countNumbers(size);
 
-    if (msg->data == NULL)
+    if(msg->data_size == 0) {
         msg->data = malloc(count + 1);
+    }
 
     sprintf(msg->data, "%d", size);
     msg->data_size = strlen(msg->data) + 1;

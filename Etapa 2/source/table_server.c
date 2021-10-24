@@ -9,8 +9,8 @@ int main(int argc, char const *argv[])
     if (argc != 3)
     {
         printf("Erro na execução\n");
-        printf("Uso: ./<path_to_exe>/table.server <port> <n_lists>\n");
-        printf("Exemplo de uso: ./binary/table.server 9393 5\n");
+        printf("Uso: ./<path_to_exe>/table-server <port> <n_lists>\n");
+        printf("Exemplo de uso: ./binary/table-server 12345 5\n");
         return -1;
     }
 

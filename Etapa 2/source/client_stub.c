@@ -5,6 +5,7 @@
 #include "client_stub.h"
 #include "network_client.h"
 #include "sdmessage.pb-c.h"
+#include "message-private.h"
 
 /* Remote table, que deve conter as informações necessárias para estabelecer a comunicação com o servidor. A definir pelo grupo em client_stub-private.h
  */
@@ -95,7 +96,7 @@ int rtable_size(struct rtable_t *rtable)
     message_t__init(&msg);
     msg.opcode = 10;
     msg.c_type = 70;
-    msg.data = NULL;
+    msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
     msg.data_size = 0;
 
     len = message_t__get_packed_size(&msg);
@@ -110,25 +111,21 @@ int rtable_size(struct rtable_t *rtable)
 
     //enviar
 
-    int nbytes;
-    if ((nbytes = write(rtable->socket, buf, len)) != len)
-    {
-        perror("Erro ao enviar dados ao servidor");
-        close(server.socket);
-        return -1;
-    }
-    char *count = "";
-    MessageT *recv_msg;
-    uint8_t *recv_buf = NULL;
+    int buffer_len = htonl(len);
+    int unsig = write(rtable->socket, &buffer_len, sizeof(buffer_len)); //enviar os len
 
-    if ((nbytes = read(rtable->socket, recv_buf, len)) != len)
-    {
-        perror("Erro ao receber dados do servidor");
-        close(server.socket);
-        return -1;
-    };
-    recv_msg = message_t__unpack(NULL, len, recv_buf);
-    //printf("%d", ntohl(count));
+    int a = write_all(rtable->socket, buf, len); // enviar msg
+
+    int buffer_len_recv;
+    int d = read(rtable->socket, &buffer_len_recv, sizeof(int)); // ler o len
+    int normal = ntohl(buffer_len_recv);
+
+    MessageT *recv_msg;
+    uint8_t *recv_buf = malloc(len);
+
+    int b = read_all(rtable->socket, recv_buf, len);
+    recv_msg = message_t__unpack(NULL, len, recv_buf); // ler msg
+    printf("%d , %d", recv_msg->opcode, recv_msg->c_type);
 
     return 1;
 }

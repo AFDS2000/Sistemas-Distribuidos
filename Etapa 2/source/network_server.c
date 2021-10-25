@@ -6,7 +6,6 @@
 #include "inet-private.h"
 #include "message-private.h"
 
-static struct sockaddr_in server;
 
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
@@ -15,6 +14,7 @@ static struct sockaddr_in server;
 int network_server_init(short port)
 {
     int sockfd;
+    struct sockaddr_in server;
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         return -1;
 
@@ -82,8 +82,6 @@ int network_main_loop(int listening_socket)
         // Fecha socket referente a esta conexão
         close(connsockfd);
     }
-    // Fecha socket
-    close(listening_socket);
     return 0;
 }
 
@@ -158,8 +156,8 @@ int network_send(int client_socket, MessageT *msg)
 /* A função network_server_close() liberta os recursos alocados por
  * network_server_init().
  */
-int network_server_close()
+int network_server_close(int listening_socket)
 {
-
+    close(listening_socket);
     return 0;
 }

@@ -54,7 +54,7 @@ int invoke(MessageT *msg) {
     default:
         msg->opcode = 99;
         msg->c_type = 70;
-        msg->data = NULL;
+        //msg->data = NULL;
         msg->data_size = 0;
     }
     return 0;

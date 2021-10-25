@@ -25,6 +25,12 @@ message message_t
         }
         C_type c_type = 2;
         sint32 data_size = 3;
-        string data = 4;
+        bytes data = 4;
+
+        message Key
+        {
+                string key = 1;
+        }
+        repeated Key keys = 5;
 
 };

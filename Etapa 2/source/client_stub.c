@@ -11,7 +11,7 @@
  */
 struct rtable_t server;
 
-/* Função para estabelecer uma associação entre o cliente e o servidor, 
+/* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
  * Retorna NULL em caso de erro.
  */
@@ -62,7 +62,7 @@ struct rtable_t *rtable_connect(const char *address_port)
     return &server;
 }
 
-/* Termina a associação entre o cliente e o servidor, fechando a 
+/* Termina a associação entre o cliente e o servidor, fechando a
  * ligação com o servidor e libertando toda a memória local.
  * Retorna 0 se tudo correr bem e -1 em caso de erro.
  */
@@ -79,7 +79,7 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry);
  */
 struct data_t *rtable_get(struct rtable_t *rtable, char *key);
 
-/* Função para remover um elemento da tabela. Vai libertar 
+/* Função para remover um elemento da tabela. Vai libertar
  * toda a memoria alocada na respetiva operação rtable_put().
  * Devolve: 0 (ok), -1 (key not found ou problemas).
  */
@@ -96,8 +96,26 @@ int rtable_size(struct rtable_t *rtable)
     message_t__init(&msg);
     msg.opcode = 10;
     msg.c_type = 70;
-    msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+    // msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
     msg.data_size = 0;
+    msg.n_keys = 2;
+    msg.keys = malloc(2 * sizeof(MessageT__Key *));
+    MessageT__Key *key_temp = malloc(2 * sizeof(struct MessageT__Key *));
+
+    char *key1 = "ola";
+    char *key2 = "adeus";
+
+    message_t__key__init(&key_temp[0]);
+    // escreve key na entry
+    key_temp[0].key = malloc(strlen(key1) + 1);
+    strcpy(key_temp[0].key, key1);
+    msg.keys[0] = &key_temp[0];
+
+    message_t__key__init(&key_temp[1]);
+    // escreve key na entry
+    key_temp[1].key = malloc(strlen(key2) + 1);
+    strcpy(key_temp[1].key, key2);
+    msg.keys[1] = &key_temp[1];
 
     len = message_t__get_packed_size(&msg);
     printf("Tamanho: %d", len);
@@ -110,10 +128,10 @@ int rtable_size(struct rtable_t *rtable)
     }
     message_t__pack(&msg, buf);
 
-    //enviar
+    // enviar
 
     int buffer_len = htonl(len);
-    int unsig = write(rtable->socket, &buffer_len, sizeof(buffer_len)); //enviar os len
+    int unsig = write(rtable->socket, &buffer_len, sizeof(buffer_len)); // enviar os len
 
     int a = write_all(rtable->socket, buf, len); // enviar msg
 

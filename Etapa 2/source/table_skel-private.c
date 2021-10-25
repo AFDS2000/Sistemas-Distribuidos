@@ -23,19 +23,25 @@ void get_table_size(MessageT *msg, struct table_t *table)
     msg->opcode += 1;
     msg->c_type = 50;
 
+    for(int i = 0; i < msg->n_keys; i++) {
+        printf("Key %d: %s\n", i, msg->keys[i]->key);
+    }
+
     size = table_size(table);
     count = countNumbers(size);
 
+    /*
     if(msg->data_size == 0) {
         msg->data = malloc(count + 1);
-    }
+    }*/
 
-    sprintf(msg->data, "%d", size);
-    msg->data_size = strlen(msg->data) + 1;
+    //sprintf(msg->data, "%d", size);
+    //msg->data_size = strlen(msg->data) + 1;
 }
 
 void del_entry(MessageT *msg, struct table_t *table)
 {
+    /*
     char *key = strdup(msg->data);
 
     int err = table_del(table, key);
@@ -51,11 +57,12 @@ void del_entry(MessageT *msg, struct table_t *table)
     }
 
     msg->data = NULL;
-    msg->data_size = 0;
+    msg->data_size = 0; */
 }
 
 void get_entry(MessageT *msg, struct table_t *table)
 {
+    /*
     char *key = strdup(msg->data);
     struct data_t *data = table_get(table, key);
 
@@ -71,7 +78,7 @@ void get_entry(MessageT *msg, struct table_t *table)
     {
         msg->data = data->data;
         msg->data_size = data->datasize;
-    }
+    } */
 }
 
 void put_entry(MessageT *msg, struct table_t *table)

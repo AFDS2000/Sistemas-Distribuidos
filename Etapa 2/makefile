@@ -49,11 +49,11 @@ vpath %.o $(OBJ_DIR)
 	mv sdmessage.pb-c.c $(SRC_DIR)/
 	mv sdmessage.pb-c.h include/
 
+all: table-client table-server
+
 #library
 client-lib.o:
 	ld -r client_stub.o -o client-lib.o
-
-all: table_client #table_server
 
 table-client: $(table_client_objects)
 	$(CC) $(addprefix $(OBJ_DIR)/,$(table_client_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@

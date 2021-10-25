@@ -20,8 +20,8 @@ int main(int argc, char const *argv[])
 
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 
-    int listening_socket = network_server_init(port);
-    if (listening_socket < 0)
+    int server_socket = network_server_init(port);
+    if (server_socket < 0)
     {
         printf("Erro ao preprar o socket");
         return -1;
@@ -31,15 +31,15 @@ int main(int argc, char const *argv[])
     err = table_skel_init(n_lists);
     if (err < 0) {
         printf("Erro ao criar a tabela");
-        network_server_close();
+        network_server_close(server_socket);
         return err;
 
     }
         
-    network_main_loop(listening_socket);
+    network_main_loop(server_socket);
 
-    // destroir a table
-    table_skel_destroy();
+    table_skel_destroy(); // destroir a tabela
+    network_server_close(server_socket); //fechar o socket do server
 
     return 0;
 }

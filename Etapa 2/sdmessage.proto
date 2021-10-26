@@ -26,11 +26,12 @@ message message_t
         C_type c_type = 2;
         sint32 data_size = 3;
         bytes data = 4;
+        sint32 table_size = 5;
 
         message Key
         {
                 string key = 1;
         }
-        repeated Key keys = 5;
+        repeated Key keys = 6;
 
 };

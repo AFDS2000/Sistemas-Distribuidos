@@ -31,8 +31,7 @@ void get_table_size(MessageT *msg, struct table_t *table)
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
 
-    int count = countNumbers(table_size(table));
-    msg->table_size = count;
+    msg->table_size = table_size(table);
 }
 
 void del_entry(MessageT *msg, struct table_t *table)
@@ -113,7 +112,7 @@ void get_keys(MessageT *msg, struct table_t *table)
     // pois as estuturas de entries e de msg.entries s~ao diferentes)
     for (int i = 0; i < numKeys; i++)
     {
-        sdmessage__entry__init(&key_temp[i]);
+        message_t__key__init(&key_temp[i]);
 
         key_temp[i].key = malloc(strlen(keys[i]) + 1);
         strcpy(key_temp[i].key, keys[i]);
@@ -121,7 +120,7 @@ void get_keys(MessageT *msg, struct table_t *table)
         msg->keys[i] = &key_temp[i];
     }
 
-    msg->opcode += 1; 
+    msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_KEYS;
 }
 

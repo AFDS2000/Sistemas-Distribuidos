@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "client_stub.h"
-
+#include "client_stub-private.h"
 #define MAX_LEN 2048
 
 int op_code(char string[])
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     char input[MAX_LEN] = "";
     do
     {
-        system("clear");
+        //system("clear");
         printf("Comandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");
@@ -55,14 +55,18 @@ int main(int argc, char *argv[])
         printf("  table_print\n");
         printf("  quit\n");
         printf("\nInput: ");
-        
+
         char *erro = fgets(input, MAX_LEN, stdin);
         if (erro == NULL)
         {
             printf("Erro! Foi intruduzido uma string nao reconhecida\n");
             continue;
         }
-
+        struct data_t *data;
+        struct entry_t *entry;
+        char *key;
+        char *data_token;
+        char *print = "";
         char *token = strtok(input, barra_n);
         token = strtok(token, espaco);
         int opCode = op_code(token);
@@ -70,29 +74,54 @@ int main(int argc, char *argv[])
         switch (opCode)
         {
         case 10:
-            printf("\n  size  \n");
-            int derp = rtable_size(table);
+            printf("\n  size: %d  \n", rtable_size(table));
 
             break;
 
         case 20:
-            printf("  delete  ");
+            token = strtok(NULL, espaco);
+
+            key = token;
+            printf("  delete  %d", rtable_del(table, key));
 
             break;
 
         case 30:
-            printf("  get  ");
+            token = strtok(NULL, espaco);
+            key = token;
+
+            data = rtable_get(table, key);
+            if (!data->data)
+            {
+                print = (char *)data->data;
+            }
+            printf("  get :%s \n", print);
 
             break;
 
         case 40:
-            printf("  put  ");
+            token = strtok(NULL, espaco);
 
+            key = token;
+            token = strtok(NULL, espaco);
+
+            data_token = token;
+            int len = strlen(data_token);
+            data = data_create2(len, data_token);
+
+            entry = entry_create(key, data);
+            printf("  put  %d \n", rtable_put(table, entry));
+            //entry_destroy(entry);
             break;
 
         case 50:
-            printf("  getkeys  ");
+            printf("  getkeys  \n");
+            char **chaves = rtable_get_keys(table);
 
+            for (int i = 0; chaves[i] != NULL; i++)
+            {
+                printf("%s\n", chaves[i]);
+            }
             break;
 
         case 60:

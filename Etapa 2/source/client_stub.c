@@ -17,7 +17,6 @@ struct rtable_t server;
  */
 struct rtable_t *rtable_connect(const char *address_port)
 {
-    int nbytes;
     char str[MAX_MSG];
     str[MAX_MSG - 1] = '\0';
     strncpy(str, "ola", MAX_MSG - 1); // variaveis antes apenas para testar
@@ -72,87 +71,146 @@ int rtable_disconnect(struct rtable_t *rtable);
  * Se a key já existe, vai substituir essa entrada pelos novos dados.
  * Devolve 0 (ok, em adição/substituição) ou -1 (problemas).
  */
-int rtable_put(struct rtable_t *rtable, struct entry_t *entry);
+int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
+{
+    MessageT mensagem;
+
+    MessageT *msg = &mensagem;
+    message_t__init(&mensagem);
+    msg->opcode = MESSAGE_T__OPCODE__OP_PUT;
+    msg->c_type = MESSAGE_T__C_TYPE__CT_ENTRY;
+
+    msg->n_keys = 1;
+    msg->keys = malloc(sizeof(MessageT__Key *));
+    MessageT__Key *key_temp = malloc(sizeof(MessageT__Key));
+    message_t__key__init(&key_temp[0]);
+
+    key_temp[0].key = malloc(strlen(entry->key) + 1);
+    strcpy(key_temp[0].key, entry->key);
+    msg->keys[0] = &key_temp[0];
+
+    msg->data_size = entry->value->datasize;
+    ProtobufCBinaryData data_temp;
+    data_temp.len = entry->value->datasize;
+    data_temp.data = malloc(entry->value->datasize);
+    memcpy(data_temp.data, entry->value->data, entry->value->datasize);
+    msg->data = data_temp;
+
+    MessageT *msg_recv = network_send_receive(rtable, msg);
+    if (msg_recv->opcode != msg->opcode + 1)
+    {
+        return -1;
+    }
+
+    return 0;
+}
 
 /* Função para obter um elemento da tabela.
  * Em caso de erro, devolve NULL.
  */
-struct data_t *rtable_get(struct rtable_t *rtable, char *key);
+struct data_t *rtable_get(struct rtable_t *rtable, char *key)
+{
+    MessageT mensagem;
+
+    MessageT *msg = &mensagem;
+    message_t__init(&mensagem);
+    msg->opcode = MESSAGE_T__OPCODE__OP_GET;
+    msg->c_type = MESSAGE_T__C_TYPE__CT_KEY;
+
+    msg->n_keys = 1;
+    msg->keys = malloc(sizeof(MessageT__Key *));
+    MessageT__Key *key_temp = malloc(sizeof(MessageT__Key));
+    message_t__key__init(&key_temp[0]);
+
+    key_temp[0].key = malloc(strlen(key) + 1);
+    strcpy(key_temp[0].key, key);
+    msg->keys[0] = &key_temp[0];
+    MessageT *msg_recv = network_send_receive(rtable, msg);
+    if (msg_recv->opcode != msg->opcode + 1)
+    {
+        return NULL;
+    }
+
+    struct data_t *data = data_create(msg_recv->data.len);
+    memcpy(data->data, msg_recv->data.data, data->datasize);
+    return data;
+}
 
 /* Função para remover um elemento da tabela. Vai libertar
  * toda a memoria alocada na respetiva operação rtable_put().
  * Devolve: 0 (ok), -1 (key not found ou problemas).
  */
-int rtable_del(struct rtable_t *rtable, char *key);
+int rtable_del(struct rtable_t *rtable, char *key)
+{
+    MessageT mensagem;
+
+    MessageT *msg = &mensagem;
+    message_t__init(&mensagem);
+    msg->opcode = MESSAGE_T__OPCODE__OP_DEL;
+    msg->c_type = MESSAGE_T__C_TYPE__CT_KEY;
+
+    msg->n_keys = 1;
+    msg->keys = malloc(sizeof(MessageT__Key *));
+    MessageT__Key *key_temp = malloc(sizeof(MessageT__Key));
+    message_t__key__init(&key_temp[0]);
+
+    key_temp[0].key = malloc(strlen(key) + 1);
+    strcpy(key_temp[0].key, key);
+    msg->keys[0] = &key_temp[0];
+    MessageT *msg_recv = network_send_receive(rtable, msg);
+    if (msg_recv->opcode != msg->opcode + 1)
+    {
+        return -1;
+    }
+    return 0;
+}
 
 /* Devolve o número de elementos contidos na tabela.
  */
 int rtable_size(struct rtable_t *rtable)
 {
-    unsigned len;
     MessageT msg;
-    uint8_t *buf = NULL;
 
     message_t__init(&msg);
     msg.opcode = 10;
     msg.c_type = 70;
-    // msg.data = NULL; //"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
     msg.data_size = 0;
-    msg.n_keys = 2;
-    msg.keys = malloc(2 * sizeof(MessageT__Key *));
-    MessageT__Key *key_temp = malloc(2 * sizeof(struct MessageT__Key *));
-
-    char *key1 = "ola";
-    char *key2 = "adeus";
-
-    message_t__key__init(&key_temp[0]);
-    // escreve key na entry
-    key_temp[0].key = malloc(strlen(key1) + 1);
-    strcpy(key_temp[0].key, key1);
-    msg.keys[0] = &key_temp[0];
-
-    message_t__key__init(&key_temp[1]);
-    // escreve key na entry
-    key_temp[1].key = malloc(strlen(key2) + 1);
-    strcpy(key_temp[1].key, key2);
-    msg.keys[1] = &key_temp[1];
-
-    len = message_t__get_packed_size(&msg);
-    printf("Tamanho: %d", len);
-
-    buf = malloc(len);
-    if (buf == NULL)
+    MessageT *msg_recv = network_send_receive(rtable, &msg);
+    if (msg_recv->opcode != msg.opcode + 1)
     {
-        fprintf(stdout, "malloc error\n");
         return -1;
     }
-    message_t__pack(&msg, buf);
-
-    // enviar
-
-    int buffer_len = htonl(len);
-    int unsig = write(rtable->socket, &buffer_len, sizeof(buffer_len)); // enviar os len
-
-    int a = write_all(rtable->socket, buf, len); // enviar msg
-
-    int buffer_len_recv;
-    int d = read(rtable->socket, &buffer_len_recv, sizeof(int)); // ler o len
-    int normal = ntohl(buffer_len_recv);
-
-    MessageT *recv_msg;
-    uint8_t *recv_buf = malloc(len);
-
-    int b = read_all(rtable->socket, recv_buf, len);
-    recv_msg = message_t__unpack(NULL, len, recv_buf); // ler msg
-    printf("%d , %d", recv_msg->opcode, recv_msg->c_type);
-
-    return 1;
+    return msg_recv->table_size;
 }
 
 /* Devolve um array de char* com a cópia de todas as keys da tabela,
  * colocando um último elemento a NULL.
  */
-char **rtable_get_keys(struct rtable_t *rtable);
+char **rtable_get_keys(struct rtable_t *rtable)
+{
+    MessageT msg;
+
+    message_t__init(&msg);
+    msg.opcode = MESSAGE_T__OPCODE__OP_GETKEYS;
+    msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
+    MessageT *msg_recv = network_send_receive(rtable, &msg);
+    if (msg_recv->opcode != msg.opcode + 1)
+    {
+        return NULL;
+    }
+
+    char **lista = malloc(sizeof(char *) * (msg_recv->n_keys + 1));
+
+    int i = 0;
+    for (i = 0; i < msg_recv->n_keys; i++)
+    {
+        int size_key = strlen(msg_recv->keys[i]->key) + 1;
+        lista[i] = malloc(size_key);
+        memcpy(lista[i], msg_recv->keys[i]->key, size_key);
+    }
+    lista[i + 1] = NULL;
+    return lista;
+}
 
 /* Liberta a memória alocada por rtable_get_keys().
  */

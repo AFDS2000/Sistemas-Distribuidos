@@ -4,6 +4,14 @@
 
 #include "table_skel-private.h"
 
+int countKeys(char **keys) {
+    int i = 0;
+    while(keys[i]) {
+        i++;
+    }
+    return i;
+}
+
 void get_table_size(MessageT *msg, struct table_t *table)
 {
     msg->opcode += 1;
@@ -34,8 +42,7 @@ void get_entry(MessageT *msg, struct table_t *table)
         return;
     }
 
-    char *key = strdup(msg->keys[0]);
-    struct data_t *data = table_get(table, key);
+    struct data_t *data = table_get(table, msg->keys[0]);
 
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_VALUE;

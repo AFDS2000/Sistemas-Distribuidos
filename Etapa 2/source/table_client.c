@@ -8,25 +8,6 @@
 
 #define MAX_LEN 2048
 
-int op_code(char string[])
-{
-    if (strcmp(string, "size") == 0)
-        return 10;
-    if (strcmp(string, "del") == 0)
-        return 20;
-    if (strcmp(string, "get") == 0)
-        return 30;
-    if (strcmp(string, "put") == 0)
-        return 40;
-    if (strcmp(string, "getkeys") == 0)
-        return 50;
-    if (strcmp(string, "print") == 0)
-        return 60;
-    if (strcmp(string, "quit") == 0)
-        return 0;
-    return -1;
-}
-
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -43,7 +24,6 @@ int main(int argc, char *argv[])
     char input[MAX_LEN] = "";
     do
     {
-        //system("clear");
         printf("Comandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");
@@ -95,7 +75,7 @@ int main(int argc, char *argv[])
                 return -1;
 
             data = rtable_get(table, key);
-            printf("  get :");
+            printf("  get: ");
 
             if (data && data->data)
             {
@@ -152,18 +132,13 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(token, "quit") == 0)
         {
-
-            printf(" bye bye ");
+            printf(" bye bye \n");
         }
         else
         {
             printf("Erro! Comando nao reconhecido\n");
         }
 
-        fflush(stdin);
-        printf("Prima ENTER para continuar\n");
-        getchar();
-        fflush(stdin);
     } while (strcmp(input, "quit") != 0);
     return 0;
 }

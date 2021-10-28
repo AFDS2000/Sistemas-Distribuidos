@@ -9,7 +9,7 @@ BIN_DIR = binary
 PROTOC_DIR = /usr/local/
 
 #client
-table_client_objects = data.o entry.o table_client.o client_stub.o network_client.o sdmessage.pb-c.o message-private.o 
+table_client_objects = data.o entry.o list.o table.o table-private.o table_client.o client_stub.o network_client.o sdmessage.pb-c.o message-private.o 
 
 #server
 table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o network_server.o table_skel.o table_skel-private.o sdmessage.pb-c.o message-private.o
@@ -24,11 +24,11 @@ sdmessage.pb-c.o = sdmessage.pb-c.h
 message-private.o = message-private.h
 
 table_client.o = data.h client_stub.h client_stub-private.h 
-client_stub.o = client_stub.h client_stub-private.h sdmessage.pb-c.h message-private.h
+client_stub.o = table.h client_stub.h client_stub-private.h sdmessage.pb-c.h message-private.h
 network_client.o = network_client.h client_stub-private.h message-private.h
 
 table_server.o = table_skel.h network_server.h
-network_server.o = message-private.h inet-private.h table_skel.h network_server.h sdmessage.pb-c.h
+network_server.o = table.h message-private.h inet-private.h table_skel.h network_server.h sdmessage.pb-c.h
 table_skel.o = table_skel.h table_skel-private.h
 table_skel-private.o = table_skel-private.h
 

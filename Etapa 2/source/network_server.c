@@ -6,7 +6,8 @@
 #include "network_server.h"
 #include "inet-private.h"
 #include "message-private.h"
-#include <time.h>
+#include "table.h"
+
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
  * Retornar descritor do socket (OK) ou -1 (erro).
@@ -67,6 +68,7 @@ int network_main_loop(int listening_socket)
     {
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
+
         MessageT *msg;
         msg = network_receive(connsockfd);
 
@@ -157,9 +159,6 @@ int network_send(int client_socket, MessageT *msg)
         return -1;
     }
 
-    msg = message_t__unpack(NULL, len, buf); // de-serializar msg
-
-    //libertacao da memoria da msg
     message_t__free_unpacked(msg, NULL);
     free(buf);
     return 0;

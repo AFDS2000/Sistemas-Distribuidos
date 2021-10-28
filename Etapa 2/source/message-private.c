@@ -29,11 +29,11 @@ int read_all(int sock, uint8_t *buf, int len)
     while (len > 0)
     {
         int res = read(sock, buf, len);
-        if (res < 0)
+        if (res <= 0)
         {
             if (errno == EINTR)
                 continue;
-            perror("Erro ao receber dados do cliente");
+            perror("read failed:");
             return res;
         }
         buf += res;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "network_client.h"
 #include "client_stub-private.h"
@@ -15,6 +16,8 @@
  */
 int network_connect(struct rtable_t *rtable)
 {
+    signal(SIGPIPE, SIG_IGN);
+
     if ((rtable->socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         perror("Erro ao criar socket TCP");
@@ -62,23 +65,27 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         return NULL;
     }
     unsigned int buffer_len = htonl(len);
-    if (write(rtable->socket, &buffer_len, sizeof(buffer_len)) < 0)
+    if (write(rtable->socket, &buffer_len, sizeof(buffer_len)) <= 0)
     {
+        free(buf);
+
         perror("Erro ao enviar dados para o servidor");
         return NULL;
     }; // enviar os len
     message_t__pack(msg, buf);
     if (write_all(rtable->socket, buf, len) < 0)
     {
+        free(buf);
+
         perror("Erro ao enviar dados para o servidor");
         return NULL;
-    }; // enviar msg
-    //message_t__free_unpacked(msg, NULL);
+    } // enviar msg
     free(buf);
 
     unsigned int buffer_len_recv;
-    if (read(rtable->socket, &buffer_len_recv, sizeof(buffer_len_recv)) < 0)
+    if (read(rtable->socket, &buffer_len_recv, sizeof(buffer_len_recv)) <= 0)
     {
+
         perror("Erro ao receber dados do servidor");
         return NULL;
     }; // ler o len
@@ -92,8 +99,10 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         return NULL;
     }
 
-    if (read_all(rtable->socket, recv_buf, len_recv) < 0)
+    if (read_all(rtable->socket, recv_buf, len_recv) <= 0)
     {
+        free(recv_buf);
+
         perror("Erro ao receber dados do servidor");
         return NULL;
     };
@@ -105,4 +114,7 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 /* A função network_close() fecha a ligação estabelecida por
  * network_connect().
  */
-int network_close(struct rtable_t *rtable);
+int network_close(struct rtable_t *rtable)
+{
+    return close(rtable->socket);
+}

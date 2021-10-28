@@ -41,15 +41,15 @@ vpath %.o $(OBJ_DIR)
 %.o: $(SRC_DIR)/%.c $($@)
 	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
 
+all: table-client table-server
+
 %.pb-c.o: $(SRC_DIR)/%.pb-c.c $($@)
 	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
 	
-%.pb-c.c:%.proto
+sdmessage.pb-c.c: sdmessage.proto
 	${PROTOC_DIR}bin/protoc-c sdmessage.proto --c_out=./
 	mv sdmessage.pb-c.c $(SRC_DIR)/
 	mv sdmessage.pb-c.h include/
-
-all: table-client table-server
 
 #library
 client-lib.o:
@@ -62,5 +62,9 @@ table-server: $(table_server_objects)
 	$(CC) $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 clean:
-	rm -f $(OBJ_DIR)/*.o && rm -f $(OBJ_DIR)/*.d
+	rm -f $(OBJ_DIR)/*.o
 	rm -f $(BIN_DIR)/*
+
+clean-sdmessage:
+	rm -f $(SRC_DIR)/*.pb-c.c
+	rm -f $(SRC_DIR)/*.pb-c.h

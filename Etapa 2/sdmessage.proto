@@ -27,11 +27,6 @@ message message_t
         sint32 data_size = 3;
         bytes data = 4;
         sint32 table_size = 5;
-
-        message Key
-        {
-                string key = 1;
-        }
-        repeated Key keys = 6;
+        repeated string keys = 6;
 
 };

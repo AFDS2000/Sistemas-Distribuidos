@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "table_skel.h"
 #include "network_server.h"
+
+int server_socket;
+
+void closeSocket(int num) {
+    network_server_close(server_socket);
+}
 
 int main(int argc, char const *argv[])
 {
@@ -20,7 +27,9 @@ int main(int argc, char const *argv[])
 
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 
-    int server_socket = network_server_init(port);
+    server_socket = network_server_init(port);
+    signal(SIGINT, closeSocket);
+
     if (server_socket < 0)
     {
         printf("Erro ao preprar o socket");
@@ -39,7 +48,6 @@ int main(int argc, char const *argv[])
     network_main_loop(server_socket);
 
     table_skel_destroy(); // destroir a tabela
-    network_server_close(server_socket); //fechar o socket do server
 
     return 0;
 }

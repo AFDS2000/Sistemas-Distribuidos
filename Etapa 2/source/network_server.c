@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "table_skel.h"
 #include "network_server.h"
@@ -21,6 +22,11 @@ int network_server_init(short port)
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
     server.sin_addr.s_addr = htons(INADDR_ANY);
+
+    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+        close(sockfd);
+        return -1;
+    }
 
     // bind
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) < 0)
@@ -59,6 +65,7 @@ int network_main_loop(int listening_socket)
     // socket pronta a comunicar com o cliente.
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
+        signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
 
         MessageT *msg = network_receive(connsockfd);
@@ -109,9 +116,12 @@ MessageT *network_receive(int client_socket)
     {
         return NULL;
     }
-    MessageT *recv_msg = NULL;
-    recv_msg = message_t__unpack(NULL, buffer_len_recv, recv_buf); // de-serializar msg
-    return recv_msg;
+    
+    MessageT *msg = NULL;
+    msg = message_t__unpack(NULL, buffer_len_recv, recv_buf); // de-serializar msg
+
+    free(recv_buf);
+    return msg;
 }
 
 /* Esta função deve:
@@ -148,8 +158,11 @@ int network_send(int client_socket, MessageT *msg)
         return -1;
     }
 
+    msg = message_t__unpack(NULL, len, buf); // de-serializar msg
+
     //libertacao da memoria da msg
     message_t__free_unpacked(msg, NULL);
+    free(buf);
     return 0;
 }
 

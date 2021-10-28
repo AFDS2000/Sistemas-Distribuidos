@@ -17,10 +17,6 @@ struct rtable_t server;
  */
 struct rtable_t *rtable_connect(const char *address_port)
 {
-    char str[MAX_MSG];
-    str[MAX_MSG - 1] = '\0';
-    strncpy(str, "ola", MAX_MSG - 1); // variaveis antes apenas para testar
-
     char *addr_port = strdup(address_port);
     char *token;
     const char s[2] = ":";
@@ -41,23 +37,7 @@ struct rtable_t *rtable_connect(const char *address_port)
     {
         return NULL;
     };
-
-    /*
-
-    if ((nbytes = write(server.socket, str, strlen(str))) != strlen(str))
-    {
-        perror("Erro ao enviar dados ao servidor");
-        close(server.socket);
-        return NULL;
-    }
-    int count;
-    if ((nbytes = read(server.socket, &count, sizeof(count))) != sizeof(count))
-    {
-        perror("Erro ao receber dados do servidor");
-        close(server.socket);
-        return NULL;
-    };
-    printf("%d", ntohl(count)); */
+    free(addr_port);
     return &server;
 }
 
@@ -65,7 +45,10 @@ struct rtable_t *rtable_connect(const char *address_port)
  * ligação com o servidor e libertando toda a memória local.
  * Retorna 0 se tudo correr bem e -1 em caso de erro.
  */
-int rtable_disconnect(struct rtable_t *rtable);
+int rtable_disconnect(struct rtable_t *rtable)
+{
+    return network_close(rtable);
+}
 
 /* Função para adicionar um elemento na tabela.
  * Se a key já existe, vai substituir essa entrada pelos novos dados.
@@ -99,8 +82,15 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
     MessageT *msg_recv = network_send_receive(rtable, msg);
     if (msg_recv->opcode != msg->opcode + 1)
     {
+        message_t__free_unpacked(msg_recv, NULL);
+
         return -1;
     }
+    free(msg->keys);
+    free(key_temp[0].key);
+    free(key_temp);
+    free(data_temp.data);
+    message_t__free_unpacked(msg_recv, NULL);
 
     return 0;
 }
@@ -128,11 +118,19 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     MessageT *msg_recv = network_send_receive(rtable, msg);
     if (msg_recv->opcode != msg->opcode + 1)
     {
+        message_t__free_unpacked(msg_recv, NULL);
+
         return NULL;
     }
 
     struct data_t *data = data_create(msg_recv->data.len);
     memcpy(data->data, msg_recv->data.data, data->datasize);
+
+    free(key_temp[0].key);
+    free(key_temp);
+    free(msg->keys);
+    message_t__free_unpacked(msg_recv, NULL);
+
     return data;
 }
 
@@ -160,8 +158,16 @@ int rtable_del(struct rtable_t *rtable, char *key)
     MessageT *msg_recv = network_send_receive(rtable, msg);
     if (msg_recv->opcode != msg->opcode + 1)
     {
+        message_t__free_unpacked(msg_recv, NULL);
+
         return -1;
     }
+    free(key_temp[0].key);
+    free(key_temp);
+    free(msg->keys);
+
+    message_t__free_unpacked(msg_recv, NULL);
+
     return 0;
 }
 
@@ -176,11 +182,21 @@ int rtable_size(struct rtable_t *rtable)
     msg.c_type = 70;
     msg.data_size = 0;
     MessageT *msg_recv = network_send_receive(rtable, &msg);
-    if (msg_recv->opcode != msg.opcode + 1)
+    if (!msg_recv)
     {
+        close(rtable->socket);
         return -1;
     }
-    return msg_recv->table_size;
+    if (msg_recv->opcode != msg.opcode + 1)
+    {
+        message_t__free_unpacked(msg_recv, NULL);
+
+        return -1;
+    }
+    int size = msg_recv->table_size;
+    message_t__free_unpacked(msg_recv, NULL);
+
+    return size;
 }
 
 /* Devolve um array de char* com a cópia de todas as keys da tabela,
@@ -196,6 +212,8 @@ char **rtable_get_keys(struct rtable_t *rtable)
     MessageT *msg_recv = network_send_receive(rtable, &msg);
     if (msg_recv->opcode != msg.opcode + 1)
     {
+        message_t__free_unpacked(msg_recv, NULL);
+
         return NULL;
     }
 
@@ -208,13 +226,28 @@ char **rtable_get_keys(struct rtable_t *rtable)
         lista[i] = malloc(size_key);
         memcpy(lista[i], msg_recv->keys[i]->key, size_key);
     }
-    lista[i + 1] = NULL;
+    lista[i] = NULL;
+    message_t__free_unpacked(msg_recv, NULL);
+
     return lista;
 }
 
 /* Liberta a memória alocada por rtable_get_keys().
  */
-void rtable_free_keys(char **keys);
+void rtable_free_keys(char **keys)
+{
+    if (keys == NULL)
+        return;
+
+    int i = 0;
+    while (keys[i] != NULL)
+    {
+        free(keys[i]);
+        i++;
+    }
+    free(keys);
+    return;
+}
 
 /* Função que imprime o conteúdo da tabela remota para o terminal.
  */

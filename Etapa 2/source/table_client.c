@@ -4,6 +4,8 @@
 
 #include "client_stub.h"
 #include "client_stub-private.h"
+#include "sdmessage.pb-c.h"
+
 #define MAX_LEN 2048
 
 int op_code(char string[])
@@ -38,10 +40,6 @@ int main(int argc, char *argv[])
     const char espaco[2] = " ";
     const char barra_n[2] = "\n";
 
-    struct rtable_t *table = rtable_connect(argv[1]);
-    if (table == NULL)
-        return -1;
-
     char input[MAX_LEN] = "";
     do
     {
@@ -62,59 +60,77 @@ int main(int argc, char *argv[])
             printf("Erro! Foi intruduzido uma string nao reconhecida\n");
             continue;
         }
+        struct rtable_t *table;
         struct data_t *data;
         struct entry_t *entry;
-        char *key;
         char *data_token;
-        char *print = "";
         char *token = strtok(input, barra_n);
-        token = strtok(token, espaco);
-        int opCode = op_code(token);
 
-        switch (opCode)
+        token = strtok(input, espaco);
+        char *key = strtok(NULL, espaco);
+
+        data_token = strtok(NULL, espaco);
+        if (strcmp(token, "size") == 0)
         {
-        case 10:
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
+
             printf("\n  size: %d  \n", rtable_size(table));
+            rtable_disconnect(table);
+        }
+        else if (strcmp(token, "del") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
 
-            break;
-
-        case 20:
-            token = strtok(NULL, espaco);
-
-            key = token;
             printf("  delete  %d", rtable_del(table, key));
-
-            break;
-
-        case 30:
-            token = strtok(NULL, espaco);
-            key = token;
+            rtable_disconnect(table);
+        }
+        else if (strcmp(token, "get") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
 
             data = rtable_get(table, key);
-            if (!data->data)
+            printf("  get :");
+
+            if (data && data->data)
             {
-                print = (char *)data->data;
+                char temp;
+                for (int i = 0; i < data->datasize; i++)
+                {
+                    memcpy(&temp, data->data + i, 1);
+                    printf("%c", temp);
+                }
             }
-            printf("  get :%s \n", print);
+            printf("\n");
+            rtable_disconnect(table);
+            data_destroy(data);
+        }
+        else if (strcmp(token, "put") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
 
-            break;
-
-        case 40:
-            token = strtok(NULL, espaco);
-
-            key = token;
-            token = strtok(NULL, espaco);
-
-            data_token = token;
             int len = strlen(data_token);
-            data = data_create2(len, data_token);
+            data = data_create(len);
+            memcpy(data->data, data_token, len);
 
-            entry = entry_create(key, data);
+            entry = entry_create(strdup(key), data);
             printf("  put  %d \n", rtable_put(table, entry));
-            //entry_destroy(entry);
-            break;
+            rtable_disconnect(table);
+            entry_destroy(entry);
+        }
+        else if (strcmp(token, "getkeys") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
 
-        case 50:
             printf("  getkeys  \n");
             char **chaves = rtable_get_keys(table);
 
@@ -122,16 +138,25 @@ int main(int argc, char *argv[])
             {
                 printf("%s\n", chaves[i]);
             }
-            break;
+            rtable_disconnect(table);
+            rtable_free_keys(chaves);
+        }
 
-        case 60:
+        else if (strcmp(token, "print") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
             printf("  print  ");
+            rtable_disconnect(table);
+        }
+        else if (strcmp(token, "quit") == 0)
+        {
 
-            break;
-        case 0:
             printf(" bye bye ");
-            break;
-        default:
+        }
+        else
+        {
             printf("Erro! Comando nao reconhecido\n");
         }
 
@@ -139,7 +164,6 @@ int main(int argc, char *argv[])
         printf("Prima ENTER para continuar\n");
         getchar();
         fflush(stdin);
-
     } while (strcmp(input, "quit") != 0);
     return 0;
 }

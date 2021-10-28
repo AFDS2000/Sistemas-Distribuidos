@@ -6,14 +6,14 @@
 #include "network_server.h"
 #include "inet-private.h"
 #include "message-private.h"
-
-
+#include <time.h>
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
  * Retornar descritor do socket (OK) ou -1 (erro).
  */
 int network_server_init(short port)
 {
+    signal(SIGPIPE, SIG_IGN);
     int sockfd;
     struct sockaddr_in server;
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -67,21 +67,18 @@ int network_main_loop(int listening_socket)
     {
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
+        MessageT *msg;
+        msg = network_receive(connsockfd);
 
-        MessageT *msg = network_receive(connsockfd);
-        if (msg == NULL)
+        if (invoke(msg) < 0)
         {
-            close(connsockfd);
-            continue;
-        }
-        
-        if(invoke(msg) < 0) {
             perror("Erro ao ler dados");
             close(connsockfd);
             continue;
         }
 
-        if(network_send(connsockfd, msg) < 0) {
+        if (network_send(connsockfd, msg) < 0)
+        {
             close(connsockfd);
             continue;
         }
@@ -102,7 +99,7 @@ MessageT *network_receive(int client_socket)
     int buffer_len_recv;
 
     // Primeiro read recebe o unsigned len
-    if (read(client_socket, &buffer_len_recv, sizeof(int)) < 0)
+    if (read(client_socket, &buffer_len_recv, sizeof(int)) <= 0)
     {
         perror("Erro ao receber dados do cliente");
         return NULL;
@@ -112,7 +109,7 @@ MessageT *network_receive(int client_socket)
     uint8_t *recv_buf = malloc(buffer_len_recv);
 
     //Segundo read para ler a msg serializada
-    if (read_all(client_socket, recv_buf, buffer_len_recv) < 0)
+    if (read_all(client_socket, recv_buf, buffer_len_recv) <= 0)
     {
         return NULL;
     }
@@ -147,13 +144,15 @@ int network_send(int client_socket, MessageT *msg)
     message_t__pack(msg, buf);
 
     //envio do tamanho da msg
-    if(write(client_socket, &buffer_len, sizeof(buffer_len)) < 0) {
+    if (write(client_socket, &buffer_len, sizeof(buffer_len)) < 0)
+    {
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
 
     //envio da msg
-    if(write_all(client_socket, buf, len) < 0) {
+    if (write_all(client_socket, buf, len) < 0)
+    {
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }

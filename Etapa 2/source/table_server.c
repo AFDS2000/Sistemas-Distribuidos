@@ -49,9 +49,5 @@ int main(int argc, char const *argv[])
 
     network_main_loop(server_socket);
 
-    printf("\nOla\n");
-
-    printf("\nAdeus\n");
-
     return 0;
 }

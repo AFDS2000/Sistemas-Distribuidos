@@ -17,6 +17,7 @@ int network_server_init(short port)
     signal(SIGPIPE, SIG_IGN);
     int sockfd;
     struct sockaddr_in server;
+
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         return -1;
 
@@ -57,13 +58,15 @@ int network_server_init(short port)
 int network_main_loop(int listening_socket)
 {
     int connsockfd;
+    struct sockaddr_in client;
+    socklen_t size_client;
 
     printf("Waiting conection\n");
 
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while ((connsockfd = accept(listening_socket, &client, &size_client)) != -1)
+    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
@@ -86,6 +89,7 @@ int network_main_loop(int listening_socket)
 
         // Fecha socket referente a esta conexão
         close(connsockfd);
+        printf("Closed conection\n");
     }
     return 0;
 }

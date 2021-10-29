@@ -70,6 +70,12 @@ void get_entry(MessageT *msg, struct table_t *table)
 
 void put_entry(MessageT *msg, struct table_t *table)
 {
+    if(msg->keys[0] == NULL || msg->data.len == 0) {
+        msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
+        msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
+        return;
+    }
+
     struct data_t *data = data_create(msg->data.len);
     memcpy(data->data, msg->data.data, msg->data.len);
 

@@ -9,6 +9,9 @@ int server_socket;
 
 void closeSocket(int num) {
     network_server_close(server_socket);
+    printf("\nOla\n");
+    table_skel_destroy(); // destroir a tabela
+    printf("\nAdeus\n");
 }
 
 int main(int argc, char const *argv[])
@@ -46,10 +49,6 @@ int main(int argc, char const *argv[])
     }
         
     network_main_loop(server_socket);
-
-    printf("\nOla\n");
-    table_skel_destroy(); // destroir a tabela
-    printf("\nAdeus\n");
 
     return 0;
 }

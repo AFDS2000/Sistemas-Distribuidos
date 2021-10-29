@@ -75,13 +75,14 @@ int rtable_put(struct rtable_t *rtable, struct entry_t *entry)
     msg.data = data_temp;
 
     MessageT *msg_recv = network_send_receive(rtable, &msg);
+    free(msg.keys);
+    free(data_temp.data);
     if (msg_recv->opcode != msg.opcode + 1)
     {
+
         message_t__free_unpacked(msg_recv, NULL);
         return -1;
     }
-    free(msg.keys);
-    free(data_temp.data);
     message_t__free_unpacked(msg_recv, NULL);
 
     return 0;
@@ -105,6 +106,7 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     MessageT *msg_recv = network_send_receive(rtable, &msg);
     if (msg_recv->opcode != msg.opcode + 1 || msg_recv->data.len == 0)
     {
+        free(msg.keys);
         message_t__free_unpacked(msg_recv, NULL);
         return NULL;
     }
@@ -135,13 +137,13 @@ int rtable_del(struct rtable_t *rtable, char *key)
     msg.keys[0] = key;
 
     MessageT *msg_recv = network_send_receive(rtable, &msg);
+    free(msg.keys);
     if (msg_recv->opcode != msg.opcode + 1)
     {
         message_t__free_unpacked(msg_recv, NULL);
         return -1;
     }
 
-    free(msg.keys);
     message_t__free_unpacked(msg_recv, NULL);
     return 0;
 }
@@ -159,6 +161,8 @@ int rtable_size(struct rtable_t *rtable)
     MessageT *msg_recv = network_send_receive(rtable, &msg);
     if (!msg_recv)
     {
+        message_t__free_unpacked(msg_recv, NULL);
+
         close(rtable->socket);
         return -1;
     }

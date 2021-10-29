@@ -24,7 +24,8 @@ int network_server_init(short port)
     server.sin_port = htons(port);
     server.sin_addr.s_addr = htons(INADDR_ANY);
 
-    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+    {
         close(sockfd);
         return -1;
     }
@@ -56,15 +57,13 @@ int network_server_init(short port)
 int network_main_loop(int listening_socket)
 {
     int connsockfd;
-    int client;
-    socklen_t size_client;
 
     printf("Waiting conection\n");
 
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
+    while ((connsockfd = accept(listening_socket, &client, &size_client)) != -1)
     {
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
@@ -115,7 +114,7 @@ MessageT *network_receive(int client_socket)
     {
         return NULL;
     }
-    
+
     MessageT *msg = NULL;
     msg = message_t__unpack(NULL, buffer_len_recv, recv_buf); // de-serializar msg
 

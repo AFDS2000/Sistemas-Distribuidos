@@ -22,6 +22,7 @@ struct list_t *list_create()
         return NULL;
 
     list->head = NULL;
+    list->head->next = NULL;
     list->length = 0;
     return list;
 }
@@ -63,7 +64,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     struct node_t *new_node = malloc(sizeof(struct node_t));
     if (new_node == NULL)
         return -1;
-    
+
     new_node->next = NULL;
     new_node->value = entry;
 

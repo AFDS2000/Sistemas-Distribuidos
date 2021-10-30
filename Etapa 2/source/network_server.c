@@ -58,8 +58,8 @@ int network_server_init(short port)
 int network_main_loop(int listening_socket)
 {
     int connsockfd;
-    struct sockaddr_in client;
-    socklen_t size_client;
+    struct sockaddr_in client = {0};
+    socklen_t size_client = 0;
 
     printf("Waiting conection\n");
 
@@ -80,11 +80,14 @@ int network_main_loop(int listening_socket)
             close(connsockfd);
             continue;
         }
-
-        if (network_send(connsockfd, msg) < 0)
+        else
         {
-            close(connsockfd);
-            continue;
+
+            if (network_send(connsockfd, msg) < 0)
+            {
+                close(connsockfd);
+                continue;
+            }
         }
 
         // Fecha socket referente a esta conexão

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <time.h>
 
 #include "client_stub.h"
 #include "client_stub-private.h"
@@ -8,8 +10,30 @@
 
 #define MAX_LEN 2048
 
+struct rtable_t *table;
+struct data_t *data;
+struct entry_t *entry;
+
+void closeLigacao(int num)
+{
+
+    if (!entry)
+    {
+        entry_destroy(entry);
+    }
+    if (!data)
+    {
+        data_destroy(data);
+    }
+    if (table != NULL)
+    {
+        rtable_disconnect(table);
+    }
+    exit(0);
+}
 int main(int argc, char *argv[])
 {
+
     if (argc != 2)
     {
         printf("Erro na execução\n");
@@ -33,6 +57,7 @@ int main(int argc, char *argv[])
         printf("  table_print\n");
         printf("  quit\n");
         printf("\nInput: ");
+        signal(SIGINT, closeLigacao);
 
         char *erro = fgets(input, MAX_LEN, stdin);
         if (erro == NULL)
@@ -40,17 +65,23 @@ int main(int argc, char *argv[])
             printf("Erro! Foi intruduzido uma string nao reconhecida\n");
             continue;
         }
-        struct rtable_t *table;
-        struct data_t *data;
-        struct entry_t *entry;
+
         char *data_token;
         char *token = strtok(input, barra_n);
 
         token = strtok(input, espaco);
         char *key = strtok(NULL, espaco);
-
         data_token = strtok(NULL, espaco);
-        if (strcmp(token, "size") == 0)
+
+        if (!token)
+        {
+            printf("Erro! Nenhum comando foi dado\n");
+        }
+        else if (strcmp(token, "quit") == 0)
+        {
+            printf(" bye bye \n");
+        }
+        else if (strcmp(token, "size") == 0)
         {
             table = rtable_connect(argv[1]);
             if (table == NULL)
@@ -58,6 +89,35 @@ int main(int argc, char *argv[])
 
             printf("\n  size: %d  \n", rtable_size(table));
             rtable_disconnect(table);
+        }
+        else if (strcmp(token, "print") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
+
+            printf("  print  ");
+            rtable_disconnect(table);
+        }
+        else if (strcmp(token, "getkeys") == 0)
+        {
+            table = rtable_connect(argv[1]);
+            if (table == NULL)
+                return -1;
+
+            printf("  getkeys  \n");
+            char **chaves = rtable_get_keys(table);
+
+            for (int i = 0; chaves[i] != NULL; i++)
+            {
+                printf("%s\n", chaves[i]);
+            }
+            rtable_disconnect(table);
+            rtable_free_keys(chaves);
+        }
+        else if (!key)
+        {
+            printf("Erro ! Nao foi fornecida uma chave\n");
         }
         else if (strcmp(token, "del") == 0)
         {
@@ -90,6 +150,11 @@ int main(int argc, char *argv[])
             rtable_disconnect(table);
             data_destroy(data);
         }
+        else if (!data_token)
+        {
+            printf("Erro ! Data nao fornecida\n");
+        }
+
         else if (strcmp(token, "put") == 0)
         {
             table = rtable_connect(argv[1]);
@@ -99,40 +164,11 @@ int main(int argc, char *argv[])
             int len = strlen(data_token);
             data = data_create(len);
             memcpy(data->data, data_token, len);
-
+            sleep(10);
             entry = entry_create(strdup(key), data);
             printf("  put  %d \n", rtable_put(table, entry));
             rtable_disconnect(table);
             entry_destroy(entry);
-        }
-        else if (strcmp(token, "getkeys") == 0)
-        {
-            table = rtable_connect(argv[1]);
-            if (table == NULL)
-                return -1;
-
-            printf("  getkeys  \n");
-            char **chaves = rtable_get_keys(table);
-
-            for (int i = 0; chaves[i] != NULL; i++)
-            {
-                printf("%s\n", chaves[i]);
-            }
-            rtable_disconnect(table);
-            rtable_free_keys(chaves);
-        }
-
-        else if (strcmp(token, "print") == 0)
-        {
-            table = rtable_connect(argv[1]);
-            if (table == NULL)
-                return -1;
-            printf("  print  ");
-            rtable_disconnect(table);
-        }
-        else if (strcmp(token, "quit") == 0)
-        {
-            printf(" bye bye \n");
         }
         else
         {

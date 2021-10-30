@@ -31,7 +31,7 @@ void table_skel_destroy()
 */
 int invoke(MessageT *msg)
 {
-    if (table == NULL)
+    if (table == NULL || msg == NULL)
         return -1;
 
     switch (msg->opcode)

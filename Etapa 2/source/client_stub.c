@@ -104,9 +104,11 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     msg.keys[0] = key;
 
     MessageT *msg_recv = network_send_receive(rtable, &msg);
+
+    free(msg.keys);
     if (msg_recv->opcode != msg.opcode + 1 || msg_recv->data.len == 0)
     {
-        free(msg.keys);
+
         message_t__free_unpacked(msg_recv, NULL);
         return NULL;
     }
@@ -114,7 +116,6 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     struct data_t *data = data_create(msg_recv->data.len);
     memcpy(data->data, msg_recv->data.data, data->datasize);
 
-    free(msg.keys);
     message_t__free_unpacked(msg_recv, NULL);
 
     return data;

@@ -9,6 +9,7 @@
 
 #include "sdmessage.pb-c.h"
 #include "table.h"
+#include "table-private.h"
 
 void get_table_size(MessageT *msg, struct table_t *table);
 

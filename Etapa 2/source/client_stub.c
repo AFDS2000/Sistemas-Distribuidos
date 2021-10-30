@@ -223,4 +223,34 @@ void rtable_free_keys(char **keys)
 
 /* Função que imprime o conteúdo da tabela remota para o terminal.
  */
-void rtable_print(struct rtable_t *rtable);
+void rtable_print(struct rtable_t *rtable)
+{
+
+    MessageT msg;
+
+    message_t__init(&msg);
+
+    msg.opcode = MESSAGE_T__OPCODE__OP_PRINT;
+    msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
+
+    MessageT *msg_recv = network_send_receive(rtable, &msg);
+    if (msg_recv->opcode != msg.opcode + 1 && msg_recv->c_type != MESSAGE_T__C_TYPE__CT_TABLE)
+    {
+        message_t__free_unpacked(msg_recv, NULL);
+    }
+
+    for (int i = 0; i < msg_recv->n_table; i++)
+    {
+        for (int j = 0; j < msg_recv->table[i]->n_entries; j++)
+        {
+            printf("\n-----------------------\nkey: %s \ndata: ", msg_recv->table[i]->entries[j]->key);
+            char temp;
+            for (int i = 0; i < msg_recv->table[i]->entries[j]->data.len; i++)
+            {
+                memcpy(&temp, msg_recv->table[i]->entries[j]->data.data + i, 1);
+                printf("%c", temp);
+            }
+        }
+    }
+    message_t__free_unpacked(msg_recv, NULL);
+}

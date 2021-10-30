@@ -70,7 +70,8 @@ void get_entry(MessageT *msg, struct table_t *table)
 
 void put_entry(MessageT *msg, struct table_t *table)
 {
-    if(msg->keys[0] == NULL || msg->data.len == 0) {
+    if (msg->keys[0] == NULL || msg->data.len == 0)
+    {
         msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
         msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
         return;
@@ -106,4 +107,5 @@ void get_keys(MessageT *msg, struct table_t *table)
 
 void table_to_string(MessageT *msg, struct table_t *table)
 {
+    struct list_t **items = table_print(table);
 }

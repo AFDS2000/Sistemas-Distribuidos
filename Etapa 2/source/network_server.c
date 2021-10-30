@@ -78,18 +78,16 @@ int network_main_loop(int listening_socket)
         {
             perror("Erro ao ler dados");
             close(connsockfd);
+            printf("Closed conection\n");
             continue;
         }
-        else
+
+        if (network_send(connsockfd, msg) < 0)
         {
-
-            if (network_send(connsockfd, msg) < 0)
-            {
-                close(connsockfd);
-                continue;
-            }
+            close(connsockfd);
+            printf("Closed conection\n");
+            continue;
         }
-
         // Fecha socket referente a esta conexão
         close(connsockfd);
         printf("Closed conection\n");

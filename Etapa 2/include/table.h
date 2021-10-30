@@ -64,7 +64,6 @@ void table_free_keys(char **keys);
 
 /* Função que imprime o conteúdo da tabela.
  */
-void table_print(struct table_t *table);
-
+struct list_t **table_print(struct table_t *table);
 
 #endif

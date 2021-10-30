@@ -17,7 +17,7 @@ int network_server_init(short port)
     signal(SIGPIPE, SIG_IGN);
     int sockfd;
     struct sockaddr_in server;
-    
+
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         return -1;
 
@@ -25,7 +25,8 @@ int network_server_init(short port)
     server.sin_port = htons(port);
     server.sin_addr.s_addr = htons(INADDR_ANY);
 
-    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
+    {
         close(sockfd);
         return -1;
     }
@@ -117,7 +118,7 @@ MessageT *network_receive(int client_socket)
     {
         return NULL;
     }
-    
+
     MessageT *msg = NULL;
     msg = message_t__unpack(NULL, buffer_len_recv, recv_buf); // de-serializar msg
 

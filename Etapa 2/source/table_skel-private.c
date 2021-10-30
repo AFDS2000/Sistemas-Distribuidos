@@ -4,9 +4,11 @@
 
 #include "table_skel-private.h"
 
-int countKeys(char **keys) {
+int countKeys(char **keys)
+{
     int i = 0;
-    while(keys[i]) {
+    while (keys[i])
+    {
         i++;
     }
     return i;

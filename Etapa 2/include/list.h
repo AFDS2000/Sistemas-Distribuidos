@@ -66,5 +66,4 @@ void list_free_keys(char **keys);
  */
 struct entry_t **list_print(struct list_t *list);
 
-
 #endif

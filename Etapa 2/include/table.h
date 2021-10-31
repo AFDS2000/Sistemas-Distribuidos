@@ -66,5 +66,4 @@ void table_free_keys(char **keys);
  */
 struct list_t **table_print(struct table_t *table);
 
-
 #endif

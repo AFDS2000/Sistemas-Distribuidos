@@ -8,8 +8,8 @@
 #define _TABLE_PRIVATE_H
 
 struct table_t {
+    int n_lists;
     int size;
-    int count;
     struct list_t **items;
 };
 

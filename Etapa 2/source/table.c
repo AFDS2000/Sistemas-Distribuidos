@@ -25,11 +25,11 @@ struct table_t *table_create(int n)
     if(table == NULL)
         return NULL;
     
-    table->size = n;
-    table->count = 0;
-    table->items = (struct list_t **) calloc(table->size, sizeof(struct list_t *));
+    table->n_lists = n;
+    table->size = 0;
+    table->items = (struct list_t **) calloc(table->n_lists, sizeof(struct list_t *));
     
-    for (int i = 0; i < table->size; i++)
+    for (int i = 0; i < table->n_lists; i++)
         table->items[i] = NULL;
 
     return table;
@@ -42,7 +42,7 @@ void table_destroy(struct table_t *table)
     if (table == NULL)
         return;
 
-    for (int i = 0; i < table->size; i++)
+    for (int i = 0; i < table->n_lists; i++)
     {
         struct list_t *item = table->items[i];
         if (item != NULL)
@@ -79,7 +79,7 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
         return -1;
 
     //Adicionar os dados na hash table
-    int i = hash(key, table->size);
+    int i = hash(key, table->n_lists);
     struct entry_t *entry2 = list_get(table->items[i], key_copy);
 
     if (table->items[i] == NULL)
@@ -90,7 +90,7 @@ int table_put(struct table_t *table, char *key, struct data_t *value)
 
     //Verificar se já existia na lista
     if (entry2 == NULL)
-        table->count++;
+        table->size++;
     return 0;
 }
 
@@ -108,7 +108,7 @@ struct data_t *table_get(struct table_t *table, char *key)
     if (table == NULL || key == NULL)
         return NULL;
 
-    int i = hash(key, table->size);
+    int i = hash(key, table->n_lists);
     struct entry_t *entry = list_get(table->items[i], key);
     if (entry == NULL)
         return NULL;
@@ -125,11 +125,11 @@ int table_del(struct table_t *table, char *key)
     if(table == NULL || key == NULL)
         return -1;
 
-    int i = hash(key, table->size);
+    int i = hash(key, table->n_lists);
     if (list_remove(table->items[i], key) == -1)
         return -1;
 
-    table->count--;
+    table->size--;
     return 0;
 }
 
@@ -137,7 +137,7 @@ int table_del(struct table_t *table, char *key)
  */
 int table_size(struct table_t *table)
 {
-    return table ? table->count : -1;
+    return table ? table->size : -1;
 }
 
 /* Função que devolve um array de char* com a cópia de todas as keys da
@@ -150,9 +150,9 @@ char **table_get_keys(struct table_t *table)
         return NULL;
 
     int counter = 0;
-    char **tableKeys = malloc(sizeof(char *) * (table->count + 1));
+    char **tableKeys = malloc(sizeof(char *) * (table->size + 1));
 
-    for (int i = 0; i < table->size; i++)
+    for (int i = 0; i < table->n_lists; i++)
     {
         int size = list_size(table->items[i]);
         char **listKeys = list_get_keys(table->items[i]);
@@ -186,18 +186,12 @@ void table_free_keys(char **keys)
     return;
 }
 
-/* Função que imprime o conteúdo da tabela.
+/* Função que retorna o conteúdo da tabela.
  */
-void table_print(struct table_t *table)
+struct list_t **table_print(struct table_t *table)
 {
     if (table == NULL)
-        return;
-    
-    for (int i = 0; i < table->size; i++)
-    {
-        printf("Index of table: %d\nList:", i);
-        list_print(table->items[i]);
-        printf("--------------------------------------------------------------------\n");
-    }
-    return;
+        return NULL;
+
+    return table->items;
 }

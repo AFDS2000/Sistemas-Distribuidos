@@ -62,9 +62,9 @@ char **list_get_keys(struct list_t *list);
  */
 void list_free_keys(char **keys);
 
-/* Função que imprime o conteúdo da lista para o terminal.
+/* Função que retorna o conteúdo da lista.
  */
-void list_print(struct list_t *list);
+struct entry_t **list_print(struct list_t *list);
 
 
 #endif

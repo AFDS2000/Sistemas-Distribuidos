@@ -63,7 +63,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     struct node_t *new_node = malloc(sizeof(struct node_t));
     if (new_node == NULL)
         return -1;
-
+    
     new_node->next = NULL;
     new_node->value = entry;
 
@@ -216,20 +216,23 @@ void list_free_keys(char **keys)
     return;
 }
 
-/* Função que imprime o conteúdo da lista para o terminal.
+/* Função que retorna o conteúdo da lista.
  */
-void list_print(struct list_t *list)
+struct entry_t **list_print(struct list_t *list)
 {
     if (list == NULL)
-        return;
+        return NULL;
 
+    struct entry_t **entries = malloc(list->length * sizeof(struct entry_t*));
+
+    int i = 0;
     struct node_t *node = list->head;
     while (node)
     {
-        char *key = node->value->key;
-        struct data_t *data = node->value->value;
-        printf("\n-----------------------\nkey: %s \ndatasize: %d \ndata: %s", key, data->datasize, (char *)data->data);
+        entries[i] = node->value;
         node = node->next;
+        i++;
     }
-    printf("\n-----------------------\n");
+
+    return entries;
 }

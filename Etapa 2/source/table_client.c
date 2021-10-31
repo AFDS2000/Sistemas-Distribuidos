@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <time.h>
 
 #include "client_stub.h"
 #include "client_stub-private.h"
@@ -164,7 +163,6 @@ int main(int argc, char *argv[])
             int len = strlen(data_token);
             data = data_create(len);
             memcpy(data->data, data_token, len);
-            sleep(10);
             entry = entry_create(strdup(key), data);
             printf("  put  %d \n", rtable_put(table, entry));
             rtable_disconnect(table);

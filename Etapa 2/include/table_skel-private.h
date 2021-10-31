@@ -8,7 +8,10 @@
 #define _TABLE_SKEL_PRIVATE_H
 
 #include "sdmessage.pb-c.h"
+#include "entry.h"
+#include "list.h"
 #include "table.h"
+#include "table-private.h"
 
 void get_table_size(MessageT *msg, struct table_t *table);
 

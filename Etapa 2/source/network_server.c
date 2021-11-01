@@ -163,20 +163,6 @@ int network_send(int client_socket, MessageT *msg)
         return -1;
     }
 
-    if(msg->opcode == 61) {
-        for (int i = 0; i < msg->n_table; i++) {
-
-            for(int j = 0; j < msg->table[i]->n_entries; j++) {
-                free(msg->table[i]->entries[j]->data.data);
-                free(msg->table[i]->entries[j]->key);
-            }
-
-            free(msg->table[i]->entries);
-            free(msg->table[i]);
-        }
-    }
-
-    msg->table = NULL;
     message_t__free_unpacked(msg, NULL);
     free(buf);
     return 0;

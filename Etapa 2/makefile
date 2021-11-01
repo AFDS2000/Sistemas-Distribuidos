@@ -41,7 +41,7 @@ vpath %.o $(OBJ_DIR)
 %.o: $(SRC_DIR)/%.c $($@)
 	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
 
-all: table-client table-server
+all: table-client table-server client-lib.o
 
 %.pb-c.o: $(SRC_DIR)/%.pb-c.c $($@)
 	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
@@ -53,7 +53,7 @@ sdmessage.pb-c.c: sdmessage.proto
 
 #library
 client-lib.o:
-	ld -r client_stub.o -o client-lib.o
+	ld -r $(OBJ_DIR)/message-private.o $(OBJ_DIR)/client_stub.o $(OBJ_DIR)/network_client.o $(OBJ_DIR)/data.o $(OBJ_DIR)/entry.o -o $(OBJ_DIR)/client-lib.o
 
 table-client: $(table_client_objects)
 	$(CC) $(addprefix $(OBJ_DIR)/,$(table_client_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@

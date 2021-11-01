@@ -240,16 +240,10 @@ void rtable_print(struct rtable_t *rtable)
 
     for (int i = 0; i < msg_recv->n_table; i++)
     {
-        for (int j = 0; j < msg_recv->table[i]->n_entries; j++)
-        {
-            printf("\n-----------------------\nkey: %s \ndata: ", msg_recv->table[i]->entries[j]->key);
-        
-            for (int k = 0; k < msg_recv->table[i]->entries[j]->data.len; k++)
-            {
-                printf("%c", msg_recv->table[i]->entries[j]->data.data[k]);
-            }
-            printf("\n-----------------------\n");
-        }
+
+        printf("%s", msg_recv->table[i]);
+        printf("\n-----------------------\n");
     }
+
     message_t__free_unpacked(msg_recv, NULL);
 }

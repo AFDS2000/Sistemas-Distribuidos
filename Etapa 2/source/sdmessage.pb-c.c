@@ -7,18 +7,6 @@
 #endif
 
 #include "sdmessage.pb-c.h"
-void   message_t__table__entry__init
-                     (MessageT__Table__Entry         *message)
-{
-  static const MessageT__Table__Entry init_value = MESSAGE_T__TABLE__ENTRY__INIT;
-  *message = init_value;
-}
-void   message_t__table__init
-                     (MessageT__Table         *message)
-{
-  static const MessageT__Table init_value = MESSAGE_T__TABLE__INIT;
-  *message = init_value;
-}
 void   message_t__init
                      (MessageT         *message)
 {
@@ -64,95 +52,6 @@ void   message_t__free_unpacked
   assert(message->base.descriptor == &message_t__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor message_t__table__entry__field_descriptors[2] =
-{
-  {
-    "key",
-    1,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_STRING,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__Table__Entry, key),
-    NULL,
-    &protobuf_c_empty_string,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "data",
-    2,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_BYTES,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__Table__Entry, data),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned message_t__table__entry__field_indices_by_name[] = {
-  1,   /* field[1] = data */
-  0,   /* field[0] = key */
-};
-static const ProtobufCIntRange message_t__table__entry__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 2 }
-};
-const ProtobufCMessageDescriptor message_t__table__entry__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "message_t.Table.Entry",
-  "Entry",
-  "MessageT__Table__Entry",
-  "",
-  sizeof(MessageT__Table__Entry),
-  2,
-  message_t__table__entry__field_descriptors,
-  message_t__table__entry__field_indices_by_name,
-  1,  message_t__table__entry__number_ranges,
-  (ProtobufCMessageInit) message_t__table__entry__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
-static const ProtobufCFieldDescriptor message_t__table__field_descriptors[1] =
-{
-  {
-    "entries",
-    1,
-    PROTOBUF_C_LABEL_REPEATED,
-    PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(MessageT__Table, n_entries),
-    offsetof(MessageT__Table, entries),
-    &message_t__table__entry__descriptor,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned message_t__table__field_indices_by_name[] = {
-  0,   /* field[0] = entries */
-};
-static const ProtobufCIntRange message_t__table__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 1 }
-};
-const ProtobufCMessageDescriptor message_t__table__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "message_t.Table",
-  "Table",
-  "MessageT__Table",
-  "",
-  sizeof(MessageT__Table),
-  1,
-  message_t__table__field_descriptors,
-  message_t__table__field_indices_by_name,
-  1,  message_t__table__number_ranges,
-  (ProtobufCMessageInit) message_t__table__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
 static const ProtobufCEnumValue message_t__opcode__enum_values_by_number[8] =
 {
   { "OP_BAD", "MESSAGE_T__OPCODE__OP_BAD", 0 },
@@ -299,11 +198,11 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[6] =
     "table",
     7,
     PROTOBUF_C_LABEL_REPEATED,
-    PROTOBUF_C_TYPE_MESSAGE,
+    PROTOBUF_C_TYPE_STRING,
     offsetof(MessageT, n_table),
     offsetof(MessageT, table),
-    &message_t__table__descriptor,
     NULL,
+    &protobuf_c_empty_string,
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },

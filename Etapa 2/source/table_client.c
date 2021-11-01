@@ -115,85 +115,106 @@ int main(int argc, char *argv[])
             rtable_disconnect(table);
             rtable_free_keys(chaves);
         }
-        else if (!key)
-        {
-            printf("Erro! Nao foi fornecida uma chave\n");
-        }
         else if (strcmp(token, "del") == 0)
         {
-            table = rtable_connect(argv[1]);
-            if (table == NULL)
-                return -1;
-
-            if (rtable_del(table, key) == 0)
-                printf("  Delete \"%s\": Sucesso\n", key);
+            if (!key)
+            {
+                printf("Erro! Nao foi fornecida uma chave\n");
+            }
             else
-                printf("  Delete \"%s\": Insucesso\n", key);
+            {
+                table = rtable_connect(argv[1]);
+                if (table == NULL)
+                    return -1;
 
-            rtable_disconnect(table);
+                if (rtable_del(table, key) == 0)
+                    printf("  Delete \"%s\": Sucesso\n", key);
+                else
+                    printf("  Delete \"%s\": Insucesso\n", key);
+
+                rtable_disconnect(table);
+            }
         }
         else if (strcmp(token, "get") == 0)
         {
-            table = rtable_connect(argv[1]);
-            if (table == NULL)
-                return -1;
-
-            data = rtable_get(table, key);
-            printf("  Get \"%s\": ", key);
-
-            if (data && data->data)
+            if (!key)
             {
-                char temp;
-                for (int i = 0; i < data->datasize; i++)
-                {
-                    memcpy(&temp, data->data + i, 1);
-                    printf("%c", temp);
-                }
+                printf("Erro! Nao foi fornecida uma chave\n");
             }
-            printf("\n");
-            rtable_disconnect(table);
-            data_destroy(data);
-        }
-        else if (!data_token)
-        {
-            printf("Erro ! Data nao fornecida\n");
-        }
+            else
+            {
+                table = rtable_connect(argv[1]);
+                if (table == NULL)
+                    return -1;
 
+                data = rtable_get(table, key);
+                printf("  Get \"%s\": ", key);
+
+                if (data && data->data)
+                {
+                    char temp;
+                    for (int i = 0; i < data->datasize; i++)
+                    {
+                        memcpy(&temp, data->data + i, 1);
+                        printf("%c", temp);
+                    }
+                }
+                printf("\n");
+                rtable_disconnect(table);
+                data_destroy(data);
+            }
+        }
         else if (strcmp(token, "put") == 0)
         {
-            table = rtable_connect(argv[1]);
-            if (table == NULL)
-                return -1;
-
-            //Criação da data e entry
-            int len = strlen(data_token);
-            data = data_create(len);
-            memcpy(data->data, data_token, len);
-            entry = entry_create(strdup(key), data);
-
-            if (rtable_put(table, entry) == 0)
+            if (!key)
             {
-                printf("  put  \"%s ", key);
-                char temp;
-                for (int i = 0; i < data->datasize; i++)
-                {
-                    memcpy(&temp, data->data + i, 1);
-                    printf("%c", temp);
-                }
-                printf("\": Sucesso\n");
-            } else {
-                printf("  put  \"%s ", key);
-                char temp;
-                for (int i = 0; i < data->datasize; i++)
-                {
-                    memcpy(&temp, data->data + i, 1);
-                    printf("%c", temp);
-                }
-                printf("\": Insucesso\n");
+                printf("Erro! Nao foi fornecida uma chave\n");
             }
-            
-            rtable_disconnect(table);
-            entry_destroy(entry);
+            else
+            {
+                if (!data_token)
+                {
+                    printf("Erro ! Data nao fornecida\n");
+                }
+                else
+                {
+                    table = rtable_connect(argv[1]);
+                    if (table == NULL)
+                        return -1;
+
+                    //Criação da data e entry
+                    int len = strlen(data_token);
+                    data = data_create(len);
+                    memcpy(data->data, data_token, len);
+                    entry = entry_create(strdup(key), data);
+
+                    if (rtable_put(table, entry) == 0)
+                    {
+                        printf("  put  \"%s ", key);
+                        char temp;
+                        for (int i = 0; i < data->datasize; i++)
+                        {
+                            memcpy(&temp, data->data + i, 1);
+                            printf("%c", temp);
+                        }
+                        printf("\": Sucesso\n");
+                    }
+                    else
+                    {
+                        printf("  put  \"%s ", key);
+                        char temp;
+                        for (int i = 0; i < data->datasize; i++)
+                        {
+                            memcpy(&temp, data->data + i, 1);
+                            printf("%c", temp);
+                        }
+                        printf("\": Insucesso\n");
+                    }
+
+                    rtable_disconnect(table);
+                    entry_destroy(entry);
+                }
+            }
         }
         else
         {

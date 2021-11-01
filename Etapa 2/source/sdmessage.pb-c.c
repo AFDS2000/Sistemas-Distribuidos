@@ -197,9 +197,9 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[6] =
   {
     "table",
     7,
-    PROTOBUF_C_LABEL_REPEATED,
+    PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
-    offsetof(MessageT, n_table),
+    0,   /* quantifier_offset */
     offsetof(MessageT, table),
     NULL,
     &protobuf_c_empty_string,

@@ -20,6 +20,7 @@ int network_connect(struct rtable_t *rtable)
 
     if ((rtable->socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
+
         perror("Erro ao criar socket TCP");
         return -1;
     }

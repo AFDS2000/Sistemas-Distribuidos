@@ -35,8 +35,10 @@ struct rtable_t *rtable_connect(const char *address_port)
 
         return NULL;
     }
+
     if (network_connect(&server) == -1)
     {
+        free(addr_port);
         return NULL;
     };
     free(addr_port);
@@ -237,13 +239,6 @@ void rtable_print(struct rtable_t *rtable)
     {
         message_t__free_unpacked(msg_recv, NULL);
     }
-
-    for (int i = 0; i < msg_recv->n_table; i++)
-    {
-
-        printf("%s", msg_recv->table[i]);
-        printf("\n-----------------------\n");
-    }
-
+    printf("%s", msg_recv->table);
     message_t__free_unpacked(msg_recv, NULL);
 }

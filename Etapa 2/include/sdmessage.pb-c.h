@@ -54,12 +54,11 @@ struct  _MessageT
   int32_t table_size;
   size_t n_keys;
   char **keys;
-  size_t n_table;
-  char **table;
+  char *table;
 };
 #define MESSAGE_T__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&message_t__descriptor) \
-    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, 0,NULL }
+    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, (char *)protobuf_c_empty_string }
 
 
 /* MessageT methods */

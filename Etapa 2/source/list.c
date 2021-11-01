@@ -220,7 +220,7 @@ void list_free_keys(char **keys)
  */
 char *list_print(struct list_t *list)
 {
-    char *stringBuilder = calloc(1,1000000);
+    char *stringBuilder = calloc(1, 100000000);
 
     if (list == NULL)
         return stringBuilder;
@@ -236,11 +236,11 @@ char *list_print(struct list_t *list)
         char *aux;
         char *key = node->value->key;
         struct data_t *data = node->value->value;
-        if(node->next)
+        if (node->next)
             aux = calloc(1, data->datasize + 12);
         else
-            aux = calloc(1, data->datasize + 9);
-        
+            aux = calloc(1, data->datasize + 11);
+
         //("key1", "valor1"), ("key2", "valor2"), ("key3", "valor3")
         strcat(aux, a);
         strcat(aux, key);
@@ -248,10 +248,10 @@ char *list_print(struct list_t *list)
 
         for (int i = 0; i < data->datasize; i++)
         {
-            memcpy(aux+strlen(key)+3+i, data->data + i, 1);
+            memcpy(aux + strlen(key) + 3 + i, data->data + i, 1);
         }
 
-        if(node->next)
+        if (node->next)
             strcat(aux, c);
         else
             strcat(aux, d);

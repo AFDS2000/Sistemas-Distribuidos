@@ -196,16 +196,17 @@ char *table_print(struct table_t *table)
     char a[] = "Lista ";
     char b[] = " -> ";
     char c[] = "\n";
-    char *stringBuilder = calloc(1,1000000);
+    char *stringBuilder = calloc(1, 100000000);
 
     for (int i = 0; i < table->n_lists; i++)
     {
         int count = 0;
         int num = i;
-        do {
+        do
+        {
             num /= 10;
             count++;
-        }while(num != 0);
+        } while (num != 0);
 
         char index[count];
         sprintf(index, "%d", i);

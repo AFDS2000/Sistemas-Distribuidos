@@ -1,3 +1,9 @@
+/* Grupo 31
+ * André Cabaço 53457
+ * André Seixas 53870
+ * Miguel Agostinho 53475
+ */
+
 #ifndef _NETWORK_SERVER_H
 #define _NETWORK_SERVER_H
 

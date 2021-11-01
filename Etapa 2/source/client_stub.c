@@ -1,3 +1,9 @@
+/* Grupo 31
+ * André Cabaço 53457
+ * André Seixas 53870
+ * Miguel Agostinho 53475
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,16 +29,19 @@ struct rtable_t *rtable_connect(const char *address_port)
     const char s[2] = ":";
     token = strtok(addr_port, s);
     server.ip = token;
-    token = strtok(NULL, s);
 
+    if((token = strtok(NULL, s)) == NULL) {
+        printf("Erro! Não foi especificado nenhum porto\n");
+        printf("Uso: ./<path_to_exe>/table-client <address>:<port>\n");
+        printf("Exemplo de uso: ./binary/table-client 127.0.0.1:12345\n");
+        return NULL;
+    }
     server.port = atoi(token);
-    token = strtok(NULL, s);
-    if (token)
+    if ((token = strtok(NULL, s)))
     {
         printf("Erro na execução\n");
         printf("Uso: ./<path_to_exe>/table-client <address>:<port>\n");
         printf("Exemplo de uso: ./binary/table-client 127.0.0.1:12345\n");
-
         return NULL;
     }
 

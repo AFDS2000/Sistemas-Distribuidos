@@ -9,10 +9,13 @@ BIN_DIR = binary
 PROTOC_DIR = /usr/local/
 
 #client
-table_client_objects = data.o entry.o list.o table.o table-private.o table_client.o client_stub.o network_client.o sdmessage.pb-c.o message-private.o 
+table_client_objects = table_client.o client-lib.o
 
 #server
 table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o network_server.o table_skel.o table_skel-private.o sdmessage.pb-c.o message-private.o
+
+#client-lib
+cliet_lib_objects = data.o entry.o list.o table.o table-private.o client_stub.o network_client.o message-private.o sdmessage.pb-c.o
 
 data.o = data.h
 entry.o = entry.h
@@ -41,10 +44,7 @@ vpath %.o $(OBJ_DIR)
 %.o: $(SRC_DIR)/%.c $($@)
 	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
 
-all: table-client table-server client-lib.o
-
-%.pb-c.o: $(SRC_DIR)/%.pb-c.c $($@)
-	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
+all: table-client table-server 
 	
 sdmessage.pb-c.c: sdmessage.proto
 	${PROTOC_DIR}bin/protoc-c sdmessage.proto --c_out=./
@@ -52,11 +52,11 @@ sdmessage.pb-c.c: sdmessage.proto
 	mv sdmessage.pb-c.h include/
 
 #library
-client-lib.o:
-	ld -r $(OBJ_DIR)/message-private.o $(OBJ_DIR)/client_stub.o $(OBJ_DIR)/network_client.o $(OBJ_DIR)/data.o $(OBJ_DIR)/entry.o -o $(OBJ_DIR)/client-lib.o
-
+client-lib.o: $(cliet_lib_objects)
+	ld -r $(OBJ_DIR)/data.o $(OBJ_DIR)/entry.o $(OBJ_DIR)/list.o $(OBJ_DIR)/table.o $(OBJ_DIR)/table-private.o $(OBJ_DIR)/client_stub.o $(OBJ_DIR)/network_client.o $(OBJ_DIR)/message-private.o $(OBJ_DIR)/sdmessage.pb-c.o -o lib/client-lib.o
+	
 table-client: $(table_client_objects)
-	$(CC) $(addprefix $(OBJ_DIR)/,$(table_client_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
+	$(CC) $(OBJ_DIR)/table_client.o lib/client-lib.o -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 table-server: $(table_server_objects)
 	$(CC) -fno-stack-protector $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@

@@ -1,9 +1,0 @@
-Grupo 31:
-    André Cabaço 53457
-    André Seixas 53870
-    Miguel Agostinho 53475
-
-O makefile do grupo consegue compilar todos os ficheiros executáveis apenas escrevendo no terminal "make".
-Caso seja necessário eliminar os ficheiros object (.o) ou os executáveis poderá escrever no terminal "make clean".
-
-Foi criado o ficheiro table_private.c que contém a função hash que é usada para calcular o indicie da tabela.

@@ -1,3 +1,9 @@
+/* Grupo 31
+ * André Cabaço 53457
+ * André Seixas 53870
+ * Miguel Agostinho 53475
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -20,7 +26,6 @@ int network_connect(struct rtable_t *rtable)
 
     if ((rtable->socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-
         perror("Erro ao criar socket TCP");
         return -1;
     }
@@ -62,17 +67,20 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
     buf = malloc(len);
     if (buf == NULL)
     {
-        fprintf(stdout, "malloc error\n");
+        perror("malloc error\n");
         return NULL;
     }
+
+    // enviar o len da msg
     unsigned int buffer_len = htonl(len);
     if (write(rtable->socket, &buffer_len, sizeof(buffer_len)) <= 0)
     {
         free(buf);
-
         perror("Erro ao enviar dados para o servidor");
         return NULL;
-    }; // enviar os len
+    };
+
+    // enviar msg
     message_t__pack(msg, buf);
     if (write_all(rtable->socket, buf, len) < 0)
     {
@@ -80,18 +88,19 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 
         perror("Erro ao enviar dados para o servidor");
         return NULL;
-    } // enviar msg
+    } 
     free(buf);
 
+    // receber o len da msg
     unsigned int buffer_len_recv;
     if (read(rtable->socket, &buffer_len_recv, sizeof(buffer_len_recv)) <= 0)
     {
 
         perror("Erro ao receber dados do servidor");
         return NULL;
-    }; // ler o len
-    unsigned int len_recv = ntohl(buffer_len_recv);
+    };
 
+    unsigned int len_recv = ntohl(buffer_len_recv);
     MessageT *recv_msg;
     uint8_t *recv_buf = malloc(len_recv);
     if (recv_buf == NULL)
@@ -100,14 +109,15 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
         return NULL;
     }
 
+    // receber a msg
     if (read_all(rtable->socket, recv_buf, len_recv) <= 0)
     {
         free(recv_buf);
-
         perror("Erro ao receber dados do servidor");
         return NULL;
     };
     recv_msg = message_t__unpack(NULL, len_recv, recv_buf); // ler msg
+
     free(recv_buf);
     return recv_msg;
 }

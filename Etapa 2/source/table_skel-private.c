@@ -107,13 +107,8 @@ void get_keys(MessageT *msg, struct table_t *table)
 
 void table_to_string(MessageT *msg, struct table_t *table)
 {
+
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
-
-    int n_lists = table->n_lists;
-    struct list_t **lists = table_print(table);
-    for (int i = 0; i < n_lists; i++)
-    {
-        lists[i];
-    }
+    msg->table = table_print(table);
 }

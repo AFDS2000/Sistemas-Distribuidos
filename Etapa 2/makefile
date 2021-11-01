@@ -64,6 +64,7 @@ table-server: $(table_server_objects)
 clean:
 	rm -f $(OBJ_DIR)/*.o
 	rm -f $(BIN_DIR)/*
+	rm -f lib/*
 
 clean-sdmessage:
 	rm -f $(SRC_DIR)/*.pb-c.c

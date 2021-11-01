@@ -108,7 +108,7 @@ int list_remove(struct list_t *list, char *key)
 
     //Se a lista tiver vazia
     if (list->head == NULL)
-        return 0;
+        return -1;
 
     struct node_t *node = list->head;
 

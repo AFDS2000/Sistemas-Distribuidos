@@ -108,7 +108,6 @@ struct data_t *rtable_get(struct rtable_t *rtable, char *key)
     free(msg.keys);
     if (msg_recv->opcode != msg.opcode + 1 || msg_recv->data.len == 0)
     {
-
         message_t__free_unpacked(msg_recv, NULL);
         return NULL;
     }
@@ -244,12 +243,12 @@ void rtable_print(struct rtable_t *rtable)
         for (int j = 0; j < msg_recv->table[i]->n_entries; j++)
         {
             printf("\n-----------------------\nkey: %s \ndata: ", msg_recv->table[i]->entries[j]->key);
-            char temp;
-            for (int i = 0; i < msg_recv->table[i]->entries[j]->data.len; i++)
+        
+            for (int k = 0; k < msg_recv->table[i]->entries[j]->data.len; k++)
             {
-                memcpy(&temp, msg_recv->table[i]->entries[j]->data.data + i, 1);
-                printf("%c", temp);
+                printf("%c", msg_recv->table[i]->entries[j]->data.data[k]);
             }
+            printf("\n-----------------------\n");
         }
     }
     message_t__free_unpacked(msg_recv, NULL);

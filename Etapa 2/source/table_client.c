@@ -86,16 +86,17 @@ int main(int argc, char *argv[])
             if (table == NULL)
                 return -1;
 
-            printf("\n  size: %d  \n", rtable_size(table));
+            printf("  Size: %d  \n", rtable_size(table));
             rtable_disconnect(table);
         }
-        else if (strcmp(token, "print") == 0)
+        else if (strcmp(token, "table_print") == 0)
         {
             table = rtable_connect(argv[1]);
             if (table == NULL)
                 return -1;
 
-            printf("  print  ");
+            rtable_print(table);
+            printf("  Table print:  ");
             rtable_disconnect(table);
         }
         else if (strcmp(token, "getkeys") == 0)
@@ -104,19 +105,19 @@ int main(int argc, char *argv[])
             if (table == NULL)
                 return -1;
 
-            printf("  getkeys  \n");
+            printf("  Get keys:  \n");
             char **chaves = rtable_get_keys(table);
 
             for (int i = 0; chaves[i] != NULL; i++)
             {
-                printf("%s\n", chaves[i]);
+                printf("  %s\n", chaves[i]);
             }
             rtable_disconnect(table);
             rtable_free_keys(chaves);
         }
         else if (!key)
         {
-            printf("Erro ! Nao foi fornecida uma chave\n");
+            printf("Erro! Nao foi fornecida uma chave\n");
         }
         else if (strcmp(token, "del") == 0)
         {
@@ -124,7 +125,11 @@ int main(int argc, char *argv[])
             if (table == NULL)
                 return -1;
 
-            printf("  delete  %d", rtable_del(table, key));
+            if (rtable_del(table, key) == 0)
+                printf("  Delete \"%s\": Sucesso\n", key);
+            else
+                printf("  Delete \"%s\": Insucesso\n", key);
+
             rtable_disconnect(table);
         }
         else if (strcmp(token, "get") == 0)
@@ -134,7 +139,7 @@ int main(int argc, char *argv[])
                 return -1;
 
             data = rtable_get(table, key);
-            printf("  get: ");
+            printf("  Get \"%s\": ", key);
 
             if (data && data->data)
             {
@@ -160,11 +165,33 @@ int main(int argc, char *argv[])
             if (table == NULL)
                 return -1;
 
+            //Criação da data e entry
             int len = strlen(data_token);
             data = data_create(len);
             memcpy(data->data, data_token, len);
             entry = entry_create(strdup(key), data);
-            printf("  put  %d \n", rtable_put(table, entry));
+
+            if (rtable_put(table, entry) == 0)
+            {
+                printf("  put  \"%s ", key);
+                char temp;
+                for (int i = 0; i < data->datasize; i++)
+                {
+                    memcpy(&temp, data->data + i, 1);
+                    printf("%c", temp);
+                }
+                printf("\": Sucesso\n");
+            } else {
+                printf("  put  \"%s ", key);
+                char temp;
+                for (int i = 0; i < data->datasize; i++)
+                {
+                    memcpy(&temp, data->data + i, 1);
+                    printf("%c", temp);
+                }
+                printf("\": Insucesso\n");
+            }
+            
             rtable_disconnect(table);
             entry_destroy(entry);
         }

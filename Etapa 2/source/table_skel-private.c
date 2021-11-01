@@ -107,12 +107,14 @@ void get_keys(MessageT *msg, struct table_t *table)
 
 void table_to_string(MessageT *msg, struct table_t *table)
 {
+    msg->opcode += 1;
+    msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
+
     int n_lists = table->n_lists;
     struct list_t **lists = table_print(table);
 
     msg->n_table = n_lists;
     msg->table = malloc(n_lists * sizeof(MessageT__Table *));
-
 
     MessageT__Table *table_temp = malloc(n_lists * sizeof(MessageT__Table));
     for (int i = 0; i < n_lists; i++)
@@ -122,19 +124,27 @@ void table_to_string(MessageT *msg, struct table_t *table)
 
         //Lista das entries
         int n_entries = list_size(lists[i]);
+        if (n_entries <= 0)
+        {
+            table_temp[i].n_entries = 0;
+            table_temp[i].entries = NULL;
+            msg->table[i] = &table_temp[i];
+            continue;
+        }
+
         struct entry_t **entries = list_print(lists[i]);
         table_temp[i].n_entries = n_entries;
         table_temp[i].entries = malloc(n_entries * sizeof(MessageT__Table__Entry *));
 
         MessageT__Table__Entry *entry_temp = malloc(n_entries * sizeof(MessageT__Table__Entry));
-        for (int j = 0; i < n_entries; j++)
+        for (int j = 0; j < n_entries; j++)
         {
             // Inicia entry_temp
             message_t__table__entry__init(&entry_temp[j]);
 
             // escreve key na entry
-            entry_temp[j].key = malloc(strlen(entries[i]->key) + 1);
-            strcpy(entry_temp[i].key, entries[i]->key);
+            entry_temp[j].key = malloc(strlen(entries[j]->key) + 1);
+            strcpy(entry_temp[j].key, entries[j]->key);
 
             // inicia dados na entry
             ProtobufCBinaryData data_temp;

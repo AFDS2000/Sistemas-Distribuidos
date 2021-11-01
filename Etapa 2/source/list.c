@@ -63,7 +63,7 @@ int list_add(struct list_t *list, struct entry_t *entry)
     struct node_t *new_node = malloc(sizeof(struct node_t));
     if (new_node == NULL)
         return -1;
-    
+
     new_node->next = NULL;
     new_node->value = entry;
 
@@ -218,21 +218,46 @@ void list_free_keys(char **keys)
 
 /* Função que retorna o conteúdo da lista.
  */
-struct entry_t **list_print(struct list_t *list)
+char *list_print(struct list_t *list)
 {
+    char *stringBuilder = calloc(1,1000000);
+
     if (list == NULL)
-        return NULL;
+        return stringBuilder;
 
-    struct entry_t **entries = malloc(list->length * sizeof(struct entry_t*));
-
-    int i = 0;
+    char a[] = "(";
+    char b[] = ", ";
+    char c[] = "), ";
+    char d[] = ")";
     struct node_t *node = list->head;
+
     while (node)
     {
-        entries[i] = node->value;
-        node = node->next;
-        i++;
-    }
+        char *aux;
+        char *key = node->value->key;
+        struct data_t *data = node->value->value;
+        if(node->next)
+            aux = calloc(1, data->datasize + 12);
+        else
+            aux = calloc(1, data->datasize + 9);
+        
+        //("key1", "valor1"), ("key2", "valor2"), ("key3", "valor3")
+        strcat(aux, a);
+        strcat(aux, key);
+        strcat(aux, b);
 
-    return entries;
+        for (int i = 0; i < data->datasize; i++)
+        {
+            memcpy(aux+strlen(key)+3+i, data->data + i, 1);
+        }
+
+        if(node->next)
+            strcat(aux, c);
+        else
+            strcat(aux, d);
+        strcat(stringBuilder, aux);
+        free(aux);
+        node = node->next;
+    }
+    return stringBuilder;
 }

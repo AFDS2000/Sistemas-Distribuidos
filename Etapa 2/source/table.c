@@ -24,11 +24,11 @@ struct table_t *table_create(int n)
     struct table_t *table = malloc(sizeof(struct table_t));
     if (table == NULL)
         return NULL;
-    
+
     table->n_lists = n;
     table->size = 0;
-    table->items = (struct list_t **) calloc(table->n_lists, sizeof(struct list_t *));
-    
+    table->items = (struct list_t **)calloc(table->n_lists, sizeof(struct list_t *));
+
     for (int i = 0; i < table->n_lists; i++)
         table->items[i] = NULL;
 
@@ -188,10 +188,34 @@ void table_free_keys(char **keys)
 
 /* Função que retorna o conteúdo da tabela.
  */
-struct list_t **table_print(struct table_t *table)
+char *table_print(struct table_t *table)
 {
     if (table == NULL)
-        return NULL;
+        return "";
 
-    return table->items;
+    char a[] = "Lista ";
+    char b[] = " -> ";
+    char c[] = "\n";
+    char *stringBuilder = calloc(1,1000000);
+
+    for (int i = 0; i < table->n_lists; i++)
+    {
+        int count = 0;
+        int num = i;
+        do {
+            num /= 10;
+            count++;
+        }while(num != 0);
+
+        char index[count];
+        sprintf(index, "%d", i);
+        char *str = list_print(table->items[i]);
+        strcat(stringBuilder, a);
+        strcat(stringBuilder, index);
+        strcat(stringBuilder, b);
+        strcat(stringBuilder, str);
+        strcat(stringBuilder, c);
+        free(str);
+    }
+    return stringBuilder;
 }

@@ -10,6 +10,12 @@
 
 #include "table_skel-private.h"
 
+/**
+ * Função conta número de chaves que existe na lista de chaves
+ * 
+ * @param keys lista de chaves
+ * @return int número de chaves da lista de chaves
+ */
 int countKeys(char **keys)
 {
     int i = 0;
@@ -113,7 +119,6 @@ void get_keys(MessageT *msg, struct table_t *table)
 
 void table_to_string(MessageT *msg, struct table_t *table)
 {
-
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
     msg->table = table_print(table);

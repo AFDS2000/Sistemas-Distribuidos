@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <time.h>
+//#include <pthread.h>
 
 #include "table_skel.h"
 #include "network_server.h"
@@ -72,31 +74,44 @@ int network_main_loop(int listening_socket)
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
+    while (1)
     {
+        pthread_t nova;
+        connsockfd = connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client);
+
+        if (connsockfd < 0)
+        {
+            perror("Error accepting conection from client ");
+            continue;
+        }
+
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
 
         MessageT *msg;
-        msg = network_receive(connsockfd);
-
-        if (invoke(msg) < 0)
+        while ((msg = network_receive(connsockfd)) != NULL)
         {
-            perror("Erro ao ler dados");
-            close(connsockfd);
-            printf("Closed conection\n");
-            continue;
-        }
+            clock_t tempo = clock();
+            if (invoke(msg) < 0)
+            {
+                perror("Erro ao ler dados");
+                close(connsockfd);
+                printf("Closed conection\n");
+                continue;
+            }
 
-        if (network_send(connsockfd, msg) < 0)
-        {
-            close(connsockfd);
-            printf("Closed conection\n");
-            continue;
+            if (network_send(connsockfd, msg) < 0)
+            {
+                close(connsockfd);
+                printf("Closed conection\n");
+                continue;
+            }
+            tempo = clock() - tempo;
+            //meter na stats
         }
         // Fecha socket referente a esta conexão
         close(connsockfd);
-        printf("Closed conection\n");
+        printf("Client exit: %d\n", connsockfd);
     }
     return 0;
 }
@@ -120,7 +135,7 @@ MessageT *network_receive(int client_socket)
     buffer_len_recv = ntohl(buffer_len_recv);
     uint8_t *recv_buf = malloc(buffer_len_recv);
 
-    //Segundo read para ler a msg serializada
+    // Segundo read para ler a msg serializada
     if (read_all(client_socket, recv_buf, buffer_len_recv) <= 0)
     {
         return NULL;
@@ -155,14 +170,14 @@ int network_send(int client_socket, MessageT *msg)
 
     message_t__pack(msg, buf);
 
-    //envio do tamanho da msg
+    // envio do tamanho da msg
     if (write(client_socket, &buffer_len, sizeof(buffer_len)) < 0)
     {
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
 
-    //envio da msg
+    // envio da msg
     if (write_all(client_socket, buf, len) < 0)
     {
         perror("Erro ao enviar dados para o cliente");

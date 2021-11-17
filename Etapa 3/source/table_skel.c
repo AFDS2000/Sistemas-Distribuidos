@@ -42,27 +42,29 @@ int invoke(MessageT *msg)
 
     switch (msg->opcode)
     {
-    case 10:
+    case MESSAGE_T__OPCODE__OP_SIZE:
         get_table_size(msg, table);
         break;
-    case 20:
+    case MESSAGE_T__OPCODE__OP_DEL:
         del_entry(msg, table);
         break;
-    case 30:
+    case MESSAGE_T__OPCODE__OP_GET:
         get_entry(msg, table);
         break;
-    case 40:
+    case MESSAGE_T__OPCODE__OP_PUT:
         put_entry(msg, table);
         break;
-    case 50:
+    case MESSAGE_T__OPCODE__OP_GETKEYS:
         get_keys(msg, table);
         break;
-    case 60:
+    case MESSAGE_T__OPCODE__OP_PRINT:
         table_to_string(msg, table);
         break;
+    case MESSAGE_T__OPCODE__OP_STATS:
+        break;
     default:
-        msg->opcode = 99;
-        msg->c_type = 70;
+        msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;
+        msg->c_type = MESSAGE_T__C_TYPE__CT_NONE;
     }
     return 0;
 }

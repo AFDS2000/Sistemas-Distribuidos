@@ -4,35 +4,52 @@
  * Miguel Agostinho 53475
  */
 
-syntax = "proto3";
-message message_t
- {
-        enum Opcode {
-                OP_BAD     = 0;
-                OP_SIZE    = 10;
-                OP_DEL     = 20;
-                OP_GET     = 30;
-                OP_PUT     = 40;
-                OP_GETKEYS = 50;
-                OP_PRINT   = 60;
-                OP_ERROR   = 99;
-        }
-        Opcode opcode = 1;
-
-        enum C_type {
-                CT_BAD    = 0;
-                CT_KEY    = 10;
-                CT_VALUE  = 20;
-                CT_ENTRY  = 30;
-                CT_KEYS   = 40;
-                CT_RESULT = 50;
-                CT_TABLE  = 60;
-                CT_NONE   = 70;
-        }
-        C_type c_type = 2;
-        bytes data = 4;
-        sint32 table_size = 5;
-        repeated string keys = 6;
-        string table = 7;
-
-};
+ syntax = "proto3";
+ message message_t
+  {
+         enum Opcode {
+                 OP_BAD     = 0;
+                 OP_SIZE    = 10;
+                 OP_DEL     = 20;
+                 OP_GET     = 30;
+                 OP_PUT     = 40;
+                 OP_GETKEYS = 50;
+                 OP_PRINT   = 60;
+                 OP_STATS = 70;
+                 OP_ERROR   = 99;
+         }
+         Opcode opcode = 1;
+ 
+         enum C_type {
+                 CT_BAD    = 0;
+                 CT_KEY    = 10;
+                 CT_VALUE  = 20;
+                 CT_ENTRY  = 30;
+                 CT_KEYS   = 40;
+                 CT_RESULT = 50;
+                 CT_TABLE  = 60;
+                 CT_NONE   = 70;
+         }
+         C_type c_type = 2;
+         bytes data = 3;
+         sint32 table_size = 4;
+         repeated string keys = 5;
+         string table = 6;
+ 
+         message Stats_t{
+                 sint32 nPuts = 1;
+                 double timePuts = 2;
+                 sint32 nGets = 3;
+                 double timeGets = 4;
+                 sint32 nDels = 5;
+                 double timeDels = 6;
+                 sint32 nSizes = 7;
+                 double timeSizes = 8;
+                 sint32 nGetKeys = 9;
+                 double timeGetKeys = 10;
+                 sint32 nTable_prints = 11;
+                 double timeTable_prints = 12; 
+         }
+         
+         Stats_t stats = 7; 
+ };

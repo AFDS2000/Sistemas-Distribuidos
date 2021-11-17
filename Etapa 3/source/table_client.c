@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
     char input[MAX_LEN] = "";
     do
     {
+        table = rtable_connect(argv[1]);
         printf("Comandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");
@@ -60,6 +61,7 @@ int main(int argc, char *argv[])
         printf("  put <key> <data>\n");
         printf("  getkeys\n");
         printf("  table_print\n");
+        printf("  stats\n");
         printf("  quit\n");
         printf("\nInput: ");
         signal(SIGINT, closeLigacao);
@@ -88,26 +90,29 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(token, "size") == 0)
         {
-            table = rtable_connect(argv[1]);
             if (table == NULL)
                 return -1;
 
             printf("  Size: %d  \n", rtable_size(table));
-            rtable_disconnect(table);
+        }
+        else if (strcmp(token, "stats") == 0)
+        {
+            if (table == NULL)
+                return -1;
+            struct statistics *stats = rtable_stats(table);
+            // todo fazer um display dos stats
+            printf("  Stats: %d  \n", 1);
         }
         else if (strcmp(token, "table_print") == 0)
         {
-            table = rtable_connect(argv[1]);
             if (table == NULL)
                 return -1;
 
             rtable_print(table);
             printf("  Table print:  ");
-            rtable_disconnect(table);
         }
         else if (strcmp(token, "getkeys") == 0)
         {
-            table = rtable_connect(argv[1]);
             if (table == NULL)
                 return -1;
 
@@ -118,7 +123,6 @@ int main(int argc, char *argv[])
             {
                 printf("  %s\n", chaves[i]);
             }
-            rtable_disconnect(table);
             rtable_free_keys(chaves);
         }
         else if (strcmp(token, "del") == 0)
@@ -129,7 +133,6 @@ int main(int argc, char *argv[])
             }
             else
             {
-                table = rtable_connect(argv[1]);
                 if (table == NULL)
                     return -1;
 
@@ -137,8 +140,6 @@ int main(int argc, char *argv[])
                     printf("  Delete \"%s\": Sucesso\n", key);
                 else
                     printf("  Delete \"%s\": Insucesso\n", key);
-
-                rtable_disconnect(table);
             }
         }
         else if (strcmp(token, "get") == 0)
@@ -149,7 +150,6 @@ int main(int argc, char *argv[])
             }
             else
             {
-                table = rtable_connect(argv[1]);
                 if (table == NULL)
                     return -1;
 
@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
                     }
                 }
                 printf("\n");
-                rtable_disconnect(table);
                 data_destroy(data);
             }
         }
@@ -184,7 +183,6 @@ int main(int argc, char *argv[])
                 }
                 else
                 {
-                    table = rtable_connect(argv[1]);
                     if (table == NULL)
                         return -1;
 
@@ -217,7 +215,6 @@ int main(int argc, char *argv[])
                         printf("\": Insucesso\n");
                     }
 
-                    rtable_disconnect(table);
                     entry_destroy(entry);
                 }
             }
@@ -228,5 +225,7 @@ int main(int argc, char *argv[])
         }
 
     } while (strcmp(input, "quit") != 0);
+    rtable_disconnect(table);
+
     return 0;
 }

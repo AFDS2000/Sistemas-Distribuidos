@@ -15,6 +15,7 @@ message message_t
                 OP_PUT     = 40;
                 OP_GETKEYS = 50;
                 OP_PRINT   = 60;
+                OP_STATS = 70;
                 OP_ERROR   = 99;
         }
         Opcode opcode = 1;
@@ -35,4 +36,20 @@ message message_t
         repeated string keys = 6;
         string table = 7;
 
+        message Stats_t{
+                sint32 nPuts = 1;
+                double timePuts = 2;
+                sint32 nGets = 3;
+                double timeGets = 4;
+                sint32 nDels = 5;
+                double timeDels = 6;
+                sint32 nSizes = 7;
+                double timeSizes = 8;
+                sint32 nGetKeys = 9;
+                double timeGetKeys = 10;
+                sint32 nTable_prints = 11;
+                double timeTable_prints = 12; 
+        }
+        
+        Stats_t stats = 8; 
 };

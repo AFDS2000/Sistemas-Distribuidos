@@ -27,7 +27,7 @@ sdmessage.pb-c.o = sdmessage.pb-c.h
 message-private.o = message-private.h
 
 table_client.o = data.h client_stub.h client_stub-private.h 
-client_stub.o = table.h client_stub.h client_stub-private.h sdmessage.pb-c.h message-private.h
+client_stub.o = table.h client_stub.h client_stub-private.h sdmessage.pb-c.h message-private.h stats-private.h
 network_client.o = network_client.h client_stub-private.h message-private.h
 
 table_server.o = table_skel.h network_server.h
@@ -36,7 +36,7 @@ table_skel.o = table_skel.h table_skel-private.h
 table_skel-private.o = table_skel-private.h
 
 CC = gcc
-CFLAGS = -Wall -g -O2
+CFLAGS = -Wall -g -O0
 LDFLAGS = ${PROTOC_DIR}lib/libprotobuf-c.a
 
 vpath %.o $(OBJ_DIR)

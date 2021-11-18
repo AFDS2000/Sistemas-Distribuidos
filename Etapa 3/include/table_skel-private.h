@@ -12,6 +12,7 @@
 #include "list.h"
 #include "table.h"
 #include "table-private.h"
+#include "stats_server-private.h"
 
 void get_table_size(MessageT *msg, struct table_t *table);
 
@@ -24,5 +25,7 @@ void put_entry(MessageT *msg, struct table_t *table);
 void get_keys(MessageT *msg, struct table_t *table);
 
 void table_to_string(MessageT *msg, struct table_t *table);
+
+void get_stats(MessageT *msg, struct statistics *stats);
 
 #endif

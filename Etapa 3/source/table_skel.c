@@ -9,6 +9,7 @@
 
 #include "table_skel.h"
 #include "table_skel-private.h"
+#include "stats_server-private.h"
 
 static struct table_t *table;
 
@@ -61,6 +62,7 @@ int invoke(MessageT *msg)
         table_to_string(msg, table);
         break;
     case MESSAGE_T__OPCODE__OP_STATS:
+        get_stats(msg, getStats());
         break;
     default:
         msg->opcode = MESSAGE_T__OPCODE__OP_ERROR;

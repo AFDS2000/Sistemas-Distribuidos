@@ -15,4 +15,7 @@ void stats_server_init();
 void stats_server_destroy();
 
 void update_stats(int opcode, double time);
+
+struct statistics *getStats();
+
 #endif

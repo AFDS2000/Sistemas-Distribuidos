@@ -72,3 +72,8 @@ void update_stats(int opcode, double time)
         return;
     }
 }
+
+struct statistics *getStats()
+{
+    return stats_server;
+}

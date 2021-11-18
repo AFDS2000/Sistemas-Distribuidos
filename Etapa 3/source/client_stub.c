@@ -263,13 +263,12 @@ struct statistics *rtable_stats(struct rtable_t *rtable)
     //printf("%d,%d %d,%d %d,%d %d,%d %d,%d %d %d ", estatisticas.nDels, estatisticas.nGetKeys, estatisticas.nGets, estatisticas.nPuts, estatisticas.nSizes, estatisticas.nTable_prints, estatisticas.timeDels, estatisticas.timeGetKeys, estatisticas.timeGets, estatisticas.timePuts, estatisticas.timeSizes, estatisticas.timeTable_prints);
     msg.opcode = MESSAGE_T__OPCODE__OP_STATS;
     msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
-    return NULL;
-    /*MessageT *msg_recv = network_send_receive(rtable, &msg);
+    MessageT *msg_recv = network_send_receive(rtable, &msg);
     if (msg_recv->opcode != msg.opcode + 1 && msg_recv->c_type != MESSAGE_T__C_TYPE__CT_RESULT)
     {
         message_t__free_unpacked(msg_recv, NULL);
     }
-    
-    message_t__free_unpacked(msg_recv, NULL); 
-    */
+
+    message_t__free_unpacked(msg_recv, NULL);
+    return NULL;
 }

@@ -15,6 +15,7 @@
 #include "inet-private.h"
 #include "message-private.h"
 #include "table.h"
+#include "stats_server-private.h"
 
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
@@ -72,16 +73,8 @@ int network_main_loop(int listening_socket)
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while (connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client))
+    while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
-        printf("Waiting conection\n");
-
-        if (connsockfd < 0)
-        {
-            perror("Error accepting conection from client ");
-            continue;
-        }
-
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
 
@@ -89,6 +82,8 @@ int network_main_loop(int listening_socket)
         while ((msg = network_receive(connsockfd)) != NULL)
         {
             clock_t tempo = clock();
+            int opcode = msg->opcode;
+
             if (invoke(msg) < 0)
             {
                 perror("Erro ao ler dados");
@@ -104,7 +99,8 @@ int network_main_loop(int listening_socket)
                 continue;
             }
             tempo = clock() - tempo;
-            //meter na stats
+            double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
+            update_stats(opcode, time_taken);
         }
         // Fecha socket referente a esta conexão
         close(connsockfd);

@@ -15,6 +15,6 @@ struct statistics
     double timeGetKeys;
     int nTable_prints;
     double timeTable_prints;
-} stats = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+};
 
 #endif

@@ -259,7 +259,7 @@ struct statistics *rtable_stats(struct rtable_t *rtable)
     MessageT msg;
 
     message_t__init(&msg);
-    struct statistics estatisticas = stats;
+    struct statistics estatisticas = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     //printf("%d,%d %d,%d %d,%d %d,%d %d,%d %d %d ", estatisticas.nDels, estatisticas.nGetKeys, estatisticas.nGets, estatisticas.nPuts, estatisticas.nSizes, estatisticas.nTable_prints, estatisticas.timeDels, estatisticas.timeGetKeys, estatisticas.timeGets, estatisticas.timePuts, estatisticas.timeSizes, estatisticas.timeTable_prints);
     msg.opcode = MESSAGE_T__OPCODE__OP_STATS;
     msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;

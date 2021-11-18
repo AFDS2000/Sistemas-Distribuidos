@@ -5,7 +5,8 @@
             "includePath": [
                 "${default}",
                 "${workspaceFolder}/Etapa 2/include",
-                "${workspaceFolder}/Etapa 2"
+                "${workspaceFolder}/Etapa 2",
+                "${workspaceFolder}/Etapa 3/include"
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",

@@ -8,7 +8,7 @@
 #define _CLIENT_STUB_PRIVATE_H
 
 #include <errno.h>
-#include <inet-private.h>
+#include "inet-private.h"
 
 struct rtable_t
 {

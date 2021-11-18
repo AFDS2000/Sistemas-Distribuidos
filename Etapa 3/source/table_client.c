@@ -10,6 +10,7 @@
 #include <signal.h>
 
 #include "client_stub.h"
+#include "stats-private.h"
 #include "client_stub-private.h"
 #include "sdmessage.pb-c.h"
 
@@ -51,8 +52,12 @@ int main(int argc, char *argv[])
     const char barra_n[2] = "\n";
 
     char input[MAX_LEN] = "";
-    
+
     table = rtable_connect(argv[1]);
+    if (!table)
+    {
+        closeLigacao(0);
+    }
     do
     {
         printf("Comandos do Utilizador:\n");
@@ -100,9 +105,11 @@ int main(int argc, char *argv[])
         {
             if (table == NULL)
                 return -1;
-            struct statistics *stats = rtable_stats(table);
+            struct statistics *stat = rtable_stats(table);
             // todo fazer um display dos stats
-            printf("  Stats: %d  \n", 1);
+
+            printf("  Stats:   \n   Nº Puts:%d\n   Tempo medio Puts:%lf\n   Nº Gets:%d\n   Tempo medio Gets:%lf\n   Nº Deletes:%d\n   Tempo medio Deletes:%lf\n   Nº Sizes:%d\n   Tempo medio Sizes:%lf\n   Nº GetKeys:%d\n   Tempo medio GetKeys:%lf\n   Nº TablePrints:%d\n   Tempo medio TablePrints:%lf\n", stat->nPuts, stat->timePuts, stat->nGets, stat->timeGets, stat->nDels, stat->timeDels, stat->nSizes, stat->timeSizes, stat->nGetKeys, stat->timeGetKeys, stat->nTable_prints, stat->timeTable_prints);
+            free(stat);
         }
         else if (strcmp(token, "table_print") == 0)
         {

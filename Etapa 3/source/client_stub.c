@@ -259,8 +259,6 @@ struct statistics *rtable_stats(struct rtable_t *rtable)
     MessageT msg;
 
     message_t__init(&msg);
-    struct statistics estatisticas = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    //printf("%d,%d %d,%d %d,%d %d,%d %d,%d %d %d ", estatisticas.nDels, estatisticas.nGetKeys, estatisticas.nGets, estatisticas.nPuts, estatisticas.nSizes, estatisticas.nTable_prints, estatisticas.timeDels, estatisticas.timeGetKeys, estatisticas.timeGets, estatisticas.timePuts, estatisticas.timeSizes, estatisticas.timeTable_prints);
     msg.opcode = MESSAGE_T__OPCODE__OP_STATS;
     msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
     MessageT *msg_recv = network_send_receive(rtable, &msg);
@@ -268,7 +266,19 @@ struct statistics *rtable_stats(struct rtable_t *rtable)
     {
         message_t__free_unpacked(msg_recv, NULL);
     }
-
+    struct statistics *stats_server = malloc(sizeof(struct statistics));
+    stats_server->nPuts = msg_recv->stats->nputs;
+    stats_server->timePuts = msg_recv->stats->timeputs;
+    stats_server->nGets = msg_recv->stats->ngets;
+    stats_server->timeGets = msg_recv->stats->timegets;
+    stats_server->nDels = msg_recv->stats->ndels;
+    stats_server->timeDels = msg_recv->stats->timedels;
+    stats_server->nSizes = msg_recv->stats->nsizes;
+    stats_server->timeSizes = msg_recv->stats->timesizes;
+    stats_server->nGetKeys = msg_recv->stats->ngetkeys;
+    stats_server->timeGetKeys = msg_recv->stats->timegetkeys;
+    stats_server->nTable_prints = msg_recv->stats->ntable_prints;
+    stats_server->timeTable_prints = msg_recv->stats->timetable_prints;
     message_t__free_unpacked(msg_recv, NULL);
-    return NULL;
+    return stats_server;
 }

@@ -123,3 +123,22 @@ void table_to_string(MessageT *msg, struct table_t *table)
     msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
     msg->table = table_print(table);
 }
+
+void get_stats(MessageT *msg, struct statistics *stats)
+{
+    msg->opcode += 1;
+    msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
+    msg->stats = malloc(sizeof(struct MessageT__StatsT));
+    msg->stats->nputs = stats->nPuts;
+    msg->stats->timeputs = stats->timePuts;
+    msg->stats->ngets = stats->nGets;
+    msg->stats->timegets = stats->timeGets;
+    msg->stats->ndels = stats->nDels;
+    msg->stats->timedels = stats->timeDels;
+    msg->stats->nsizes = stats->nSizes;
+    msg->stats->timesizes = stats->timeSizes;
+    msg->stats->ngetkeys = stats->nGetKeys;
+    msg->stats->timegetkeys = stats->timeGetKeys;
+    msg->stats->ntable_prints = stats->nTable_prints;
+    msg->stats->timetable_prints = stats->timeTable_prints;
+}

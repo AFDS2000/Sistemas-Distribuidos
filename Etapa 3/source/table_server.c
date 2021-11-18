@@ -18,6 +18,7 @@ void closeSocket(int num)
 {
     network_server_close(server_socket);
     table_skel_destroy(); // destroir a tabela
+    stats_server_destroy();
 }
 
 int main(int argc, char const *argv[])
@@ -37,7 +38,7 @@ int main(int argc, char const *argv[])
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 
     server_socket = network_server_init(port);
-    //signal(SIGINT, closeSocket);
+    signal(SIGINT, closeSocket);
 
     if (server_socket < 0)
     {

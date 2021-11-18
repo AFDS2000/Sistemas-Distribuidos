@@ -349,7 +349,7 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[7] =
   },
   {
     "data",
-    4,
+    3,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_BYTES,
     0,   /* quantifier_offset */
@@ -361,7 +361,7 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[7] =
   },
   {
     "table_size",
-    5,
+    4,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -373,7 +373,7 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[7] =
   },
   {
     "keys",
-    6,
+    5,
     PROTOBUF_C_LABEL_REPEATED,
     PROTOBUF_C_TYPE_STRING,
     offsetof(MessageT, n_keys),
@@ -385,7 +385,7 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[7] =
   },
   {
     "table",
-    7,
+    6,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_STRING,
     0,   /* quantifier_offset */
@@ -397,7 +397,7 @@ static const ProtobufCFieldDescriptor message_t__field_descriptors[7] =
   },
   {
     "stats",
-    8,
+    7,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_MESSAGE,
     0,   /* quantifier_offset */
@@ -417,10 +417,9 @@ static const unsigned message_t__field_indices_by_name[] = {
   5,   /* field[5] = table */
   3,   /* field[3] = table_size */
 };
-static const ProtobufCIntRange message_t__number_ranges[2 + 1] =
+static const ProtobufCIntRange message_t__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 4, 2 },
   { 0, 7 }
 };
 const ProtobufCMessageDescriptor message_t__descriptor =
@@ -434,7 +433,7 @@ const ProtobufCMessageDescriptor message_t__descriptor =
   7,
   message_t__field_descriptors,
   message_t__field_indices_by_name,
-  2,  message_t__number_ranges,
+  1,  message_t__number_ranges,
   (ProtobufCMessageInit) message_t__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

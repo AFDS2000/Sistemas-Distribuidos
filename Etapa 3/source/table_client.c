@@ -51,9 +51,10 @@ int main(int argc, char *argv[])
     const char barra_n[2] = "\n";
 
     char input[MAX_LEN] = "";
+    
+    table = rtable_connect(argv[1]);
     do
     {
-        table = rtable_connect(argv[1]);
         printf("Comandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");

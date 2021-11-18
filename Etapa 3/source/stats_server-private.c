@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "stats_server-private.h"
+#include "sdmessage.pb-c.h"
 
 static struct statistics *stats_server;
 

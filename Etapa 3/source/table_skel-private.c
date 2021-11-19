@@ -130,7 +130,6 @@ void get_stats(MessageT *msg, struct statistics *stats)
     msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
     msg->stats = malloc(sizeof(MessageT__StatsT));
     message_t__stats_t__init(msg->stats);
-
     msg->stats->nputs = stats->nPuts;
     msg->stats->timeputs = stats->timePuts;
     msg->stats->ngets = stats->nGets;

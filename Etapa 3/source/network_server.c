@@ -83,7 +83,7 @@ int network_main_loop(int listening_socket)
         {
             clock_t tempo = clock();
             int opcode = msg->opcode;
-            
+
             if (invoke(msg) < 0)
             {
                 perror("Erro ao ler dados");
@@ -99,8 +99,8 @@ int network_main_loop(int listening_socket)
                 continue;
             }
             tempo = clock() - tempo;
-            double time_taken = ((double)tempo)/CLOCKS_PER_SEC;
-            update_stats(opcode, time_taken); 
+            double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
+            update_stats(opcode, time_taken);
         }
         // Fecha socket referente a esta conexão
         close(connsockfd);

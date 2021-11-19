@@ -128,7 +128,7 @@ void get_stats(MessageT *msg, struct statistics *stats)
 {
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_RESULT;
-    msg->stats = malloc(sizeof(struct MessageT__StatsT));
+    msg->stats = malloc(sizeof(MessageT__StatsT));
     message_t__stats_t__init(msg->stats);
 
     msg->stats->nputs = stats->nPuts;
@@ -143,4 +143,5 @@ void get_stats(MessageT *msg, struct statistics *stats)
     msg->stats->timegetkeys = stats->timeGetKeys;
     msg->stats->ntable_prints = stats->nTable_prints;
     msg->stats->timetable_prints = stats->timeTable_prints;
+
 }

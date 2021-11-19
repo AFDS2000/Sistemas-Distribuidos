@@ -41,7 +41,6 @@ void update_stats(int opcode, double time)
         stats_server->timeSizes = stats_server->timeSizes * stats_server->nSizes + time;
         stats_server->nSizes++;
         stats_server->timeSizes /= stats_server->nSizes;
-        printf("Size = %d, %f", stats_server->nSizes, stats_server->timeSizes);
         break;
     case MESSAGE_T__OPCODE__OP_DEL:
         stats_server->timeDels = stats_server->timeDels * stats_server->nDels + time;

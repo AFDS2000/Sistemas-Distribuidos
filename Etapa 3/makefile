@@ -62,7 +62,7 @@ table-client: $(table_client_objects)
 	$(CC) $(OBJ_DIR)/table_client.o lib/client-lib.o -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 table-server: $(table_server_objects)
-	$(CC) -fno-stack-protector $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
+	$(CC) -pthread $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 clean:
 	rm -f $(OBJ_DIR)/*.o

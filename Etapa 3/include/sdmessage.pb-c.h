@@ -51,21 +51,16 @@ struct  MessageT__StatsT
 {
   ProtobufCMessage base;
   int32_t nputs;
-  double timeputs;
   int32_t ngets;
-  double timegets;
   int32_t ndels;
-  double timedels;
   int32_t nsizes;
-  double timesizes;
   int32_t ngetkeys;
-  double timegetkeys;
   int32_t ntable_prints;
-  double timetable_prints;
+  double avg_per_operation;
 };
 #define MESSAGE_T__STATS_T__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&message_t__stats_t__descriptor) \
-    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0, 0, 0, 0, 0, 0, 0 }
 
 
 struct  MessageT

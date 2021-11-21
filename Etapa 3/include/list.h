@@ -64,6 +64,6 @@ void list_free_keys(char **keys);
 
 /* Função que retorna o conteúdo da lista.
  */
-char *list_print(struct list_t *list);
+struct entry_t **list_print(struct list_t *list);
 
 #endif

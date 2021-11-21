@@ -108,7 +108,7 @@ int list_remove(struct list_t *list, char *key)
 
     //Se a lista tiver vazia
     if (list->head == NULL)
-        return -1;
+        return 0;
 
     struct node_t *node = list->head;
 
@@ -218,46 +218,21 @@ void list_free_keys(char **keys)
 
 /* Função que retorna o conteúdo da lista.
  */
-char *list_print(struct list_t *list)
+struct entry_t **list_print(struct list_t *list)
 {
-    char *stringBuilder = calloc(1, 100000000);
-
     if (list == NULL)
-        return stringBuilder;
+        return NULL;
 
-    char a[] = "(";
-    char b[] = ", ";
-    char c[] = "), ";
-    char d[] = ")";
+    struct entry_t **entries = malloc(list->length * sizeof(struct entry_t *));
+
+    int i = 0;
     struct node_t *node = list->head;
-
     while (node)
     {
-        char *aux;
-        char *key = node->value->key;
-        struct data_t *data = node->value->value;
-        if (node->next)
-            aux = calloc(1, data->datasize + 12);
-        else
-            aux = calloc(1, data->datasize + 11);
-
-        //("key1", "valor1"), ("key2", "valor2"), ("key3", "valor3")
-        strcat(aux, a);
-        strcat(aux, key);
-        strcat(aux, b);
-
-        for (int i = 0; i < data->datasize; i++)
-        {
-            memcpy(aux + strlen(key) + 3 + i, data->data + i, 1);
-        }
-
-        if (node->next)
-            strcat(aux, c);
-        else
-            strcat(aux, d);
-        strcat(stringBuilder, aux);
-        free(aux);
+        entries[i] = node->value;
         node = node->next;
+        i++;
     }
-    return stringBuilder;
+
+    return entries;
 }

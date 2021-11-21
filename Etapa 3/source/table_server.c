@@ -19,6 +19,7 @@ void closeSocket(int num)
     network_server_close(server_socket);
     table_skel_destroy(); // destroir a tabela
     stats_server_destroy();
+    exit(0);
 }
 
 int main(int argc, char const *argv[])

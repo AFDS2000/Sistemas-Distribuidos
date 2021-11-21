@@ -17,6 +17,7 @@ PROTOBUF_C__BEGIN_DECLS
 
 typedef struct _MessageT MessageT;
 typedef struct _MessageT__StatsT MessageT__StatsT;
+typedef struct _MessageT__Entries MessageT__Entries;
 
 
 /* --- enums --- */
@@ -68,6 +69,17 @@ struct  _MessageT__StatsT
     , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 
 
+struct  _MessageT__Entries
+{
+  ProtobufCMessage base;
+  char *keys;
+  ProtobufCBinaryData table_data;
+};
+#define MESSAGE_T__ENTRIES__INIT \
+ { PROTOBUF_C_MESSAGE_INIT (&message_t__entries__descriptor) \
+    , (char *)protobuf_c_empty_string, {0,NULL} }
+
+
 struct  _MessageT
 {
   ProtobufCMessage base;
@@ -77,17 +89,25 @@ struct  _MessageT
   int32_t table_size;
   size_t n_keys;
   char **keys;
-  char *table;
   MessageT__StatsT *stats;
+  size_t n_table_data;
+  ProtobufCBinaryData *table_data;
+  size_t n_n_entries_lista;
+  int32_t *n_entries_lista;
+  size_t n_entries;
+  MessageT__Entries **entries;
 };
 #define MESSAGE_T__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&message_t__descriptor) \
-    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, (char *)protobuf_c_empty_string, NULL }
+    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, NULL, 0,NULL, 0,NULL, 0,NULL }
 
 
 /* MessageT__StatsT methods */
 void   message_t__stats_t__init
                      (MessageT__StatsT         *message);
+/* MessageT__Entries methods */
+void   message_t__entries__init
+                     (MessageT__Entries         *message);
 /* MessageT methods */
 void   message_t__init
                      (MessageT         *message);
@@ -112,6 +132,9 @@ void   message_t__free_unpacked
 typedef void (*MessageT__StatsT_Closure)
                  (const MessageT__StatsT *message,
                   void *closure_data);
+typedef void (*MessageT__Entries_Closure)
+                 (const MessageT__Entries *message,
+                  void *closure_data);
 typedef void (*MessageT_Closure)
                  (const MessageT *message,
                   void *closure_data);
@@ -123,6 +146,7 @@ typedef void (*MessageT_Closure)
 
 extern const ProtobufCMessageDescriptor message_t__descriptor;
 extern const ProtobufCMessageDescriptor message_t__stats_t__descriptor;
+extern const ProtobufCMessageDescriptor message_t__entries__descriptor;
 extern const ProtobufCEnumDescriptor    message_t__opcode__descriptor;
 extern const ProtobufCEnumDescriptor    message_t__c_type__descriptor;
 

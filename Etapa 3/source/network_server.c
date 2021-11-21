@@ -116,14 +116,15 @@ int network_main_loop(int listening_socket)
  */
 MessageT *network_receive(int client_socket)
 {
-    int buffer_len_recv;
-
+    unsigned int buffer_len_recv;
+    uint8_t buffer_recv_buf = 0; //= malloc(sizeof(unsigned int));
     // Primeiro read recebe o unsigned len
-    if (read(client_socket, &buffer_len_recv, sizeof(int)) <= 0)
+    if (read_all(client_socket, &buffer_recv_buf, sizeof(unsigned int)) <= 0)
     {
         perror("Erro ao receber dados do cliente");
         return NULL;
     }
+    memcpy(&buffer_len_recv, &buffer_recv_buf, sizeof(unsigned int));
 
     buffer_len_recv = ntohl(buffer_len_recv);
     uint8_t *recv_buf = malloc(buffer_len_recv);
@@ -131,6 +132,7 @@ MessageT *network_receive(int client_socket)
     // Segundo read para ler a msg serializada
     if (read_all(client_socket, recv_buf, buffer_len_recv) <= 0)
     {
+        free(recv_buf);
         return NULL;
     }
 
@@ -163,16 +165,22 @@ int network_send(int client_socket, MessageT *msg)
 
     message_t__pack(msg, buf);
 
+    uint8_t *len_buffer = malloc(sizeof(unsigned int));
+    memcpy(len_buffer, &buffer_len, sizeof(unsigned int));
+
     // envio do tamanho da msg
-    if (write(client_socket, &buffer_len, sizeof(buffer_len)) < 0)
+    if (write_all(client_socket, len_buffer, sizeof(buffer_len)) < 0)
     {
+        free(len_buffer);
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
+    free(len_buffer);
 
     // envio da msg
     if (write_all(client_socket, buf, len) < 0)
     {
+        free(buf);
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }

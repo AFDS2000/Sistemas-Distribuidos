@@ -121,7 +121,54 @@ void table_to_string(MessageT *msg, struct table_t *table)
 {
     msg->opcode += 1;
     msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
-    msg->table = table_print(table);
+
+    int n_entry = 0;
+    for (int i = 0; i < table->n_lists; i++)
+    {
+        if (table->items[i] != NULL)
+        {
+            n_entry += table->items[i]->length;
+        }
+    }
+    int e = 0;
+    ProtobufCBinaryData *list_data_temp = malloc(n_entry * sizeof(ProtobufCBinaryData));
+    char **lista_keys_temp = malloc(n_entry * sizeof(char *));
+    msg->n_entries_lista = malloc(table->n_lists * sizeof(int));
+    while (e < n_entry)
+    {
+        for (int i = 0; i < table->n_lists; i++)
+        {
+
+            if (table->items[i] != NULL)
+            {
+
+                struct node_t *node = table->items[i]->head;
+                while (node)
+                {
+                    printf("\nLista:%d %s", i, node->value->key);
+                    ProtobufCBinaryData data_temp;
+                    data_temp.len = node->value->value->datasize;
+                    data_temp.data = malloc(data_temp.len);
+                    memcpy(data_temp.data, node->value->value->data, data_temp.len);
+                    //data_temp.data = node->value->value->data;
+                    list_data_temp[e] = data_temp;
+                    lista_keys_temp[e] = strdup(node->value->key);
+                    node = node->next;
+                    e++;
+                }
+                msg->n_entries_lista[i] = table->items[i]->length;
+            }
+            else
+            {
+                msg->n_entries_lista[i] = 0;
+            }
+        }
+    }
+    msg->n_n_entries_lista = table->n_lists;
+    msg->table_data = list_data_temp;
+    msg->n_table_data = n_entry;
+    msg->keys = lista_keys_temp;
+    msg->n_keys = n_entry;
 }
 
 void get_stats(MessageT *msg, struct statistics *stats)

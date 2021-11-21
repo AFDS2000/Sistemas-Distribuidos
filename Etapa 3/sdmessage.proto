@@ -34,7 +34,6 @@
          bytes data = 3;
          sint32 table_size = 4;
          repeated string keys = 5;
-         string table = 6;
  
          message Stats_t{
                  sint32 nPuts = 1;
@@ -52,4 +51,15 @@
          }
          
          Stats_t stats = 7; 
+
+         repeated bytes table_data = 6;
+         repeated sint32 n_entries_lista = 8;
+
+         repeated Entries entries = 9;
+
+         message Entries{
+                 string keys = 1;
+                 bytes table_data = 2;
+         }
+     
  };

@@ -188,35 +188,10 @@ void table_free_keys(char **keys)
 
 /* Função que retorna o conteúdo da tabela.
  */
-char *table_print(struct table_t *table)
+struct list_t **table_print(struct table_t *table)
 {
     if (table == NULL)
-        return "";
+        return NULL;
 
-    char a[] = "Lista ";
-    char b[] = " -> ";
-    char c[] = "\n";
-    char *stringBuilder = calloc(1, 100000000);
-
-    for (int i = 0; i < table->n_lists; i++)
-    {
-        int count = 0;
-        int num = i;
-        do
-        {
-            num /= 10;
-            count++;
-        } while (num != 0);
-
-        char index[count];
-        sprintf(index, "%d", i);
-        char *str = list_print(table->items[i]);
-        strcat(stringBuilder, a);
-        strcat(stringBuilder, index);
-        strcat(stringBuilder, b);
-        strcat(stringBuilder, str);
-        strcat(stringBuilder, c);
-        free(str);
-    }
-    return stringBuilder;
+    return table->items;
 }

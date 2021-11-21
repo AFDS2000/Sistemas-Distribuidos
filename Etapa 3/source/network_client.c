@@ -73,12 +73,16 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 
     // enviar o len da msg
     unsigned int buffer_len = htonl(len);
-    if (write(rtable->socket, &buffer_len, sizeof(buffer_len)) <= 0)
+    uint8_t *buffer_recv_buf = malloc(sizeof(unsigned int));
+    memcpy(buffer_recv_buf, &buffer_len, sizeof(unsigned int));
+
+    if (write_all(rtable->socket, buffer_recv_buf, sizeof(buffer_len)) <= 0)
     {
         free(buf);
         perror("Erro ao enviar dados para o servidor");
         return NULL;
     };
+    free(buffer_recv_buf);
 
     // enviar msg
     message_t__pack(msg, buf);
@@ -88,19 +92,24 @@ MessageT *network_send_receive(struct rtable_t *rtable, MessageT *msg)
 
         perror("Erro ao enviar dados para o servidor");
         return NULL;
-    } 
+    }
     free(buf);
 
     // receber o len da msg
-    unsigned int buffer_len_recv;
-    if (read(rtable->socket, &buffer_len_recv, sizeof(buffer_len_recv)) <= 0)
-    {
+    uint8_t *len_recv_buf = malloc(sizeof(unsigned int));
 
+    if (read_all(rtable->socket, len_recv_buf, sizeof(unsigned int)) <= 0)
+    {
+        free(len_recv_buf);
         perror("Erro ao receber dados do servidor");
         return NULL;
     };
 
-    unsigned int len_recv = ntohl(buffer_len_recv);
+    unsigned int len_recv;
+    memcpy(&len_recv, len_recv_buf, sizeof(unsigned int));
+    free(len_recv_buf);
+
+    len_recv = ntohl(len_recv);
     MessageT *recv_msg;
     uint8_t *recv_buf = malloc(len_recv);
     if (recv_buf == NULL)

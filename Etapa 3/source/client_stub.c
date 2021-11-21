@@ -250,7 +250,26 @@ void rtable_print(struct rtable_t *rtable)
     {
         message_t__free_unpacked(msg_recv, NULL);
     }
-    printf("%s", msg_recv->table);
+    int offset = 0;
+    for (int i = 0; i < msg_recv->n_n_entries_lista; i++)
+    {
+        printf("Lista ->%d: ", i);
+
+        for (int j = 0; j < msg_recv->n_entries_lista[i]; j++)
+        {
+            printf("(%s,", msg_recv->keys[j + offset]);
+            for (int k = 0; k < msg_recv->table_data[j + offset].len; k++)
+            {
+                char temp;
+                memcpy(&temp, msg_recv->table_data[j + offset].data + k, 1);
+                printf("%c", temp);
+            }
+            printf(") ");
+        }
+        offset += msg_recv->n_entries_lista[i];
+
+        printf("\n");
+    }
     message_t__free_unpacked(msg_recv, NULL);
 }
 

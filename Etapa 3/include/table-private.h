@@ -6,8 +6,10 @@
 
 #ifndef _TABLE_PRIVATE_H
 #define _TABLE_PRIVATE_H
+#include "list-private.h"
 
-struct table_t {
+struct table_t
+{
     int n_lists;
     int size;
     struct list_t **items;

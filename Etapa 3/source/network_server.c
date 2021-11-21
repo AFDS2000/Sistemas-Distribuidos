@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
-//#include <pthread.h>
+#include <pthread.h>
 
 #include "table_skel.h"
 #include "network_server.h"
@@ -16,6 +16,40 @@
 #include "message-private.h"
 #include "table.h"
 #include "stats_server-private.h"
+
+void *thread_main_loop(void *params)
+{
+    int connsockfd = *(int *)params;
+
+    MessageT *msg;
+    while ((msg = network_receive(connsockfd)) != NULL)
+    {
+        clock_t tempo = clock();
+        int opcode = msg->opcode;
+
+        if (invoke(msg) < 0)
+        {
+            perror("Erro ao ler dados");
+            close(connsockfd);
+            printf("Closed conection\n");
+            continue;
+        }
+
+        if (network_send(connsockfd, msg) < 0)
+        {
+            close(connsockfd);
+            printf("Closed conection\n");
+            continue;
+        }
+        tempo = clock() - tempo;
+        double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
+        update_stats(opcode, time_taken);
+    }
+    // Fecha socket referente a esta conexão
+    close(connsockfd);
+    printf("Client exit: %d\n", connsockfd);
+    return NULL;
+}
 
 /* Função para preparar uma socket de receção de pedidos de ligação
  * num determinado porto.
@@ -78,33 +112,13 @@ int network_main_loop(int listening_socket)
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
 
-        MessageT *msg;
-        while ((msg = network_receive(connsockfd)) != NULL)
+        pthread_t nova;
+        /* criação de nova thread */
+        if (pthread_create(&nova, NULL, &thread_main_loop, (void *)&connsockfd) != 0)
         {
-            clock_t tempo = clock();
-            int opcode = msg->opcode;
-
-            if (invoke(msg) < 0)
-            {
-                perror("Erro ao ler dados");
-                close(connsockfd);
-                printf("Closed conection\n");
-                continue;
-            }
-
-            if (network_send(connsockfd, msg) < 0)
-            {
-                close(connsockfd);
-                printf("Closed conection\n");
-                continue;
-            }
-            tempo = clock() - tempo;
-            double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
-            update_stats(opcode, time_taken);
+            perror("\nThread não criada.\n");
+            exit(EXIT_FAILURE);
         }
-        // Fecha socket referente a esta conexão
-        close(connsockfd);
-        printf("Client exit: %d\n", connsockfd);
     }
     return 0;
 }

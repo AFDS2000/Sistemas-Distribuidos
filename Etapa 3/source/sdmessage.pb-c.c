@@ -64,7 +64,7 @@ void   message_t__free_unpacked
   assert(message->base.descriptor == &message_t__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] =
+static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[7] =
 {
   {
     "nPuts",
@@ -79,20 +79,8 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timePuts",
-    2,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_DOUBLE,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timeputs),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "nGets",
-    3,
+    2,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -103,20 +91,8 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timeGets",
-    4,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_DOUBLE,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timegets),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "nDels",
-    5,
+    3,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -127,20 +103,8 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timeDels",
-    6,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_DOUBLE,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timedels),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "nSizes",
-    7,
+    4,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -151,20 +115,8 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timeSizes",
-    8,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_DOUBLE,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timesizes),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "nGetKeys",
-    9,
+    5,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -175,20 +127,8 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timeGetKeys",
-    10,
-    PROTOBUF_C_LABEL_NONE,
-    PROTOBUF_C_TYPE_DOUBLE,
-    0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timegetkeys),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
     "nTable_prints",
-    11,
+    7,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_SINT32,
     0,   /* quantifier_offset */
@@ -199,12 +139,12 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "timeTable_prints",
-    12,
+    "avg_per_operation",
+    8,
     PROTOBUF_C_LABEL_NONE,
     PROTOBUF_C_TYPE_DOUBLE,
     0,   /* quantifier_offset */
-    offsetof(MessageT__StatsT, timetable_prints),
+    offsetof(MessageT__StatsT, avg_per_operation),
     NULL,
     NULL,
     0,             /* flags */
@@ -212,23 +152,19 @@ static const ProtobufCFieldDescriptor message_t__stats_t__field_descriptors[12] 
   },
 };
 static const unsigned message_t__stats_t__field_indices_by_name[] = {
-  4,   /* field[4] = nDels */
-  8,   /* field[8] = nGetKeys */
-  2,   /* field[2] = nGets */
+  6,   /* field[6] = avg_per_operation */
+  2,   /* field[2] = nDels */
+  4,   /* field[4] = nGetKeys */
+  1,   /* field[1] = nGets */
   0,   /* field[0] = nPuts */
-  6,   /* field[6] = nSizes */
-  10,   /* field[10] = nTable_prints */
-  5,   /* field[5] = timeDels */
-  9,   /* field[9] = timeGetKeys */
-  3,   /* field[3] = timeGets */
-  1,   /* field[1] = timePuts */
-  7,   /* field[7] = timeSizes */
-  11,   /* field[11] = timeTable_prints */
+  3,   /* field[3] = nSizes */
+  5,   /* field[5] = nTable_prints */
 };
-static const ProtobufCIntRange message_t__stats_t__number_ranges[1 + 1] =
+static const ProtobufCIntRange message_t__stats_t__number_ranges[2 + 1] =
 {
   { 1, 0 },
-  { 0, 12 }
+  { 7, 5 },
+  { 0, 7 }
 };
 const ProtobufCMessageDescriptor message_t__stats_t__descriptor =
 {
@@ -238,10 +174,10 @@ const ProtobufCMessageDescriptor message_t__stats_t__descriptor =
   "MessageT__StatsT",
   "",
   sizeof(MessageT__StatsT),
-  12,
+  7,
   message_t__stats_t__field_descriptors,
   message_t__stats_t__field_indices_by_name,
-  1,  message_t__stats_t__number_ranges,
+  2,  message_t__stats_t__number_ranges,
   (ProtobufCMessageInit) message_t__stats_t__init,
   NULL,NULL,NULL    /* reserved[123] */
 };

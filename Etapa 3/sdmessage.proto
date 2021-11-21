@@ -34,25 +34,21 @@
          bytes data = 3;
          sint32 table_size = 4;
          repeated string keys = 5;
- 
-         message Stats_t{
-                 sint32 nPuts = 1;
-                 double timePuts = 2;
-                 sint32 nGets = 3;
-                 double timeGets = 4;
-                 sint32 nDels = 5;
-                 double timeDels = 6;
-                 sint32 nSizes = 7;
-                 double timeSizes = 8;
-                 sint32 nGetKeys = 9;
-                 double timeGetKeys = 10;
-                 sint32 nTable_prints = 11;
-                 double timeTable_prints = 12; 
-         }
          
+         message Stats_t{
+                sint32 nPuts = 1;
+                sint32 nGets = 2;
+                sint32 nDels = 3;
+                sint32 nSizes = 4;
+                sint32 nGetKeys = 5;
+                sint32 nTable_prints = 7; 
+                double avg_per_operation = 8;
+        } 
+
+        repeated bytes table_data = 6;
+
          Stats_t stats = 7; 
 
-         repeated bytes table_data = 6;
          repeated sint32 n_entries_lista = 8;
 
          repeated Entries entries = 9;
@@ -63,3 +59,4 @@
          }
      
  };
+

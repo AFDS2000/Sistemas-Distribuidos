@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     }
     do
     {
-        printf("Comandos do Utilizador:\n");
+        printf("\nComandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");
         printf("  get <key>\n");
@@ -92,39 +92,42 @@ int main(int argc, char *argv[])
         }
         else if (strcmp(token, "quit") == 0)
         {
-            printf(" bye bye \n");
+            printf(" bye bye\n");
         }
         else if (strcmp(token, "size") == 0)
         {
             if (table == NULL)
                 return -1;
 
-            printf("  Size: %d  \n", rtable_size(table));
+            printf("  Size: %d\n", rtable_size(table));
         }
         else if (strcmp(token, "stats") == 0)
         {
             if (table == NULL)
                 return -1;
-            struct statistics *stat = rtable_stats(table);
+            struct statistics *stats = rtable_stats(table);
             // todo fazer um display dos stats
 
-            printf("  Stats:   \n   Nº Puts:%d\n   Tempo medio Puts:%lf\n   Nº Gets:%d\n   Tempo medio Gets:%lf\n   Nº Deletes:%d\n   Tempo medio Deletes:%lf\n   Nº Sizes:%d\n   Tempo medio Sizes:%lf\n   Nº GetKeys:%d\n   Tempo medio GetKeys:%lf\n   Nº TablePrints:%d\n   Tempo medio TablePrints:%lf\n", stat->nPuts, stat->timePuts, stat->nGets, stat->timeGets, stat->nDels, stat->timeDels, stat->nSizes, stat->timeSizes, stat->nGetKeys, stat->timeGetKeys, stat->nTable_prints, stat->timeTable_prints);
-            free(stat);
+            printf("  Stats:\n  Nº Puts:%d\n  Nº Gets:%d\n  Nº Deletes:%d\n  Nº Sizes:%d\
+            \n  Nº GetKeys:%d\n  Nº TablePrints:%d\n  Tempo medio das operações:%lf\n", stats->nPuts, stats->nGets, 
+            stats->nDels, stats->nSizes, stats->nGetKeys, stats->nTable_prints, stats->avg_per_operation);
+            
+            free(stats);
         }
         else if (strcmp(token, "table_print") == 0)
         {
             if (table == NULL)
                 return -1;
 
+            printf("  Table print:\n");
             rtable_print(table);
-            printf("  Table print:  ");
         }
         else if (strcmp(token, "getkeys") == 0)
         {
             if (table == NULL)
                 return -1;
 
-            printf("  Get keys:  \n");
+            printf("  Get keys:\n");
             char **chaves = rtable_get_keys(table);
 
             for (int i = 0; chaves[i] != NULL; i++)

@@ -52,21 +52,16 @@ struct  _MessageT__StatsT
 {
   ProtobufCMessage base;
   int32_t nputs;
-  double timeputs;
   int32_t ngets;
-  double timegets;
   int32_t ndels;
-  double timedels;
   int32_t nsizes;
-  double timesizes;
   int32_t ngetkeys;
-  double timegetkeys;
   int32_t ntable_prints;
-  double timetable_prints;
+  double avg_per_operation;
 };
 #define MESSAGE_T__STATS_T__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&message_t__stats_t__descriptor) \
-    , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    , 0, 0, 0, 0, 0, 0, 0 }
 
 
 struct  _MessageT__Entries
@@ -89,9 +84,9 @@ struct  _MessageT
   int32_t table_size;
   size_t n_keys;
   char **keys;
-  MessageT__StatsT *stats;
   size_t n_table_data;
   ProtobufCBinaryData *table_data;
+  MessageT__StatsT *stats;
   size_t n_n_entries_lista;
   int32_t *n_entries_lista;
   size_t n_entries;
@@ -99,7 +94,7 @@ struct  _MessageT
 };
 #define MESSAGE_T__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&message_t__descriptor) \
-    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, NULL, 0,NULL, 0,NULL, 0,NULL }
+    , MESSAGE_T__OPCODE__OP_BAD, MESSAGE_T__C_TYPE__CT_BAD, {0,NULL}, 0, 0,NULL, 0,NULL, NULL, 0,NULL, 0,NULL }
 
 
 /* MessageT__StatsT methods */

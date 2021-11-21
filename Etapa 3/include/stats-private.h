@@ -4,17 +4,12 @@
 struct statistics
 {
     int nPuts;
-    double timePuts;
     int nGets;
-    double timeGets;
     int nDels;
-    double timeDels;
     int nSizes;
-    double timeSizes;
     int nGetKeys;
-    double timeGetKeys;
     int nTable_prints;
-    double timeTable_prints;
+    double avg_per_operation;
 };
 
 #endif

@@ -9,124 +9,24 @@ O makefile do grupo consegue compilar todos os ficheiros em executáveis apenas 
 Caso seja necessário eliminar os ficheiros object (.o) ou os executáveis poderá escrever no terminal "make clean".
 Caso seja necessário eliminar o ficheiro sdmessage.pb-c.c ou o ficheiro sdmessage.pb-c.h poderá escrever no terminal "make clean-sdmessage".
 
+### Relatório
 
-Foi criado o ficheiro client_stub-private.h que contém a struct rtable.
-Foi criado o ficheiro message-private.c juntamente com o ficheiro message-private.h que contém a função read_all e a função write_all.
-Foi criado o ficheiro table_skel-private.c juntamente com o ficheiro table_skel-private.h que contém as funções auxiliares onde estas ajudam a processar o pedido do cliente.
-Foi criado o ficheiro inet-private.h que contém as bibliotecas para permitir criar uma ligação entre o cliente e o servidor.
+No projeto da etapa 2 foram indentificado dois pontos a melhorar:
+    - No protobuf, não empregaram plenamente os recursos que este framework proporciona. Não foi utilizado o recurso repeated para serialização/de-serialização de entries. Diferente da técnica ensinada em aula, o envio da table do cliente para o servidor foi feito em uma string.
+    - Não empregam write_all e read_all na transmissão e receção do tamanho das mensagens (tanto no client quanto no server). Mesmo sendo pequeno o tamanho do dado transmitido/recebido nesta etapa, é prudente utilizar as referidas funções ensinadas em aula.
 
-O cliente ao realizar a operação "table_print", o grupo pensou em enviar para o cliente os dados em forma de listas e depois no lado do cliente seriam tratados para serem printados de forma correta no terminal para o cliente poder ver.
-O código que fizemos para isto acontecer no ficheiro table_skel-private.c foi o seguinte:
+Estes pontos já foram revistos e tratados.
 
-```
-void table_to_string(MessageT *msg, struct table_t *table)
-{
-    msg->opcode += 1;
-    msg->c_type = MESSAGE_T__C_TYPE__CT_TABLE;
+Relativamente à etapa 3, foram criados os seguintes ficheiros: 
+    1º stats-private.h: Este ficheiro contém a struct statistics que reprensenta a estatistica dos pedidos dos clientes ao servidor.
+    
+    2º stats_server-private.h / stats_server-private.c: Este ficheiro inicializa e destroy a estrutura que guarda as estatisticas referentes ao servidor. Também permite     atualizar as estatisticas uando ocorre algum pedido vindo do cliente e também permite obter as estatisticas do servidor.
+    
+    3º ctrl_mutex-private.h / ctrl_mutex-private.h: Este ficheiro permite fazer controlo da concorrencia da hash table e da estrutura que guarda as estatisticas. Para tratarmos da concorrência da hash table, o grupo baseou-se dos slides de Sistemas Operativos, relativamente ao problema dos Leitores/Escritores. Uma vez que o código de exemplo que está nos slides não se preocupa com a ordem de chegada do pedido, ou seja, caso esteja algum escritor à espera e novos leitores cheguem depois, estes leitores vão passar à "frente" do escritor que já estava à mais tempo à espera. Por isso adpatamos este código com o exemplo dos professores, ou seja, fazer uma fila de espera. Por tanto, o nosso código permite que vários utilizadores leiam ao mesmo tempo, bloqueando os escritores, mas caso cheguem novos pedidos para ler, estes não irão passar à "frente" dos escritores que já estão na fila de espera. Caso algum escritor esteja a escrever, nenhum leitor conseguirá ler os dados da hash table. Para o caso da concorrência da estrutura que guarda as estatisticas, apenas fazemos um lock e unlock tanto para o update como para o getStats();
 
-    int n_lists = table->n_lists;
-    struct list_t **lists = table_print(table);
+Também fizemos alteração de alguns ficheiros das etapas anterios, nomeadamente:
+    1º client_stub.h / client_stub.h: Foi acrescentado a função getStats(), onde este faz o pedido da estrutura que guarda as estatisticas do servidor.
 
-    msg->n_table = n_lists;
-    msg->table = malloc(n_lists * sizeof(MessageT__Table *));
+    2º table_skel.h / table_skel.c: Foi reajustada a assinatura da função invoke(). Esta passou a receber, para além da Message_t também um inteiro que representa o ticket da thread
 
-    MessageT__Table *table_temp = malloc(n_lists * sizeof(MessageT__Table));
-    for (int i = 0; i < n_lists; i++)
-    {
-        // Inicia table_temp
-        message_t__table__init(&table_temp[i]);
-
-        //Lista das entries
-        int n_entries = list_size(lists[i]);
-        if (n_entries <= 0)
-        {
-            table_temp[i].n_entries = 0;
-            table_temp[i].entries = NULL;
-            msg->table[i] = &table_temp[i];
-            free(&table_temp[i]);
-            continue;
-        }
-
-        struct entry_t **entries = list_print(lists[i]);
-        table_temp[i].n_entries = n_entries;
-        table_temp[i].entries = malloc(n_entries * sizeof(MessageT__Table__Entry *));
-
-        MessageT__Table__Entry *entry_temp = malloc(n_entries * sizeof(MessageT__Table__Entry));
-        for (int j = 0; j < n_entries; j++)
-        {
-            // Inicia entry_temp
-            message_t__table__entry__init(&entry_temp[j]);
-
-            // escreve key na entry
-            entry_temp[j].key = malloc(strlen(entries[j]->key) + 1);
-            strcpy(entry_temp[j].key, entries[j]->key);
-
-            // inicia dados na entry
-            ProtobufCBinaryData data_temp;
-            data_temp.len = entries[j]->value->datasize;
-            data_temp.data = malloc(entries[j]->value->datasize);
-            memcpy(data_temp.data, entries[j]->value->data, entries[j]->value->datasize);
-            entry_temp[j].data = data_temp;
-
-            table_temp[i].entries[j] = &entry_temp[j];
-        }
-        msg->table[i] = &table_temp[i];
-    }
-}
-
-```
-
-O nosso ficheiro .proto estava da seguinte maneira:
-
-```
-syntax = "proto3";
-message message_t
- {
-        enum Opcode {
-                OP_BAD     = 0;
-                OP_SIZE    = 10;
-                OP_DEL     = 20;
-                OP_GET     = 30;
-                OP_PUT     = 40;
-                OP_GETKEYS = 50;
-                OP_PRINT   = 60;
-                OP_ERROR   = 99;
-        }
-        Opcode opcode = 1;
-
-        enum C_type {
-                CT_BAD    = 0;
-                CT_KEY    = 10;
-                CT_VALUE  = 20;
-                CT_ENTRY  = 30;
-                CT_KEYS   = 40;
-                CT_RESULT = 50;
-                CT_TABLE  = 60;
-                CT_NONE   = 70;
-        }
-        C_type c_type = 2;
-        bytes data = 4;
-        sint32 table_size = 5;
-        repeated string keys = 6;
-
-        message Table
-        {
-                message Entry
-                {
-                        string key = 1;
-                        bytes data = 2;
-                }
-                repeated Entry entries = 1;
-        }
-
-        repeated Table table = 7;
-
-};
-```
-
-Só que, ao fazermos "message_t__free_unpacked(msg, NULL);" na funcção network_send do ficheiro network_server.c para libertar a memória, dava o seguinte erro no terminal:
-free(): invalid pointer
-Abortado (núcleo despejado)
-
-Este erro ficava resolvido se metessemos o "msg->tabel = NULL;" e assim já era mostrado no lado do cliente a informação da tabela, só que claro, não era libertada a memória.
-Percebemos que provavelmente isto não irá contar para nota, mas gostariamos de compartilhar a solução mais eficaz que tentamos implementar.
+    3º network_server.c: Foi adicionado a função private thread_main_loop() que é invocada quando uma thread é criada na função main_loop(). A função main_loop(), como obvio foi alterada devido ao que já foi explicado anteriormente.

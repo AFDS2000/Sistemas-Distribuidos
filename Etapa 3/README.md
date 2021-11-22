@@ -19,14 +19,10 @@ Estes pontos já foram revistos e tratados.
 
 Relativamente à etapa 3, foram criados os seguintes ficheiros: 
     1º stats-private.h: Este ficheiro contém a struct statistics que reprensenta a estatistica dos pedidos dos clientes ao servidor.
-    
     2º stats_server-private.h / stats_server-private.c: Este ficheiro inicializa e destroy a estrutura que guarda as estatisticas referentes ao servidor. Também permite     atualizar as estatisticas uando ocorre algum pedido vindo do cliente e também permite obter as estatisticas do servidor.
-    
     3º ctrl_mutex-private.h / ctrl_mutex-private.h: Este ficheiro permite fazer controlo da concorrencia da hash table e da estrutura que guarda as estatisticas. Para tratarmos da concorrência da hash table, o grupo baseou-se dos slides de Sistemas Operativos, relativamente ao problema dos Leitores/Escritores. Uma vez que o código de exemplo que está nos slides não se preocupa com a ordem de chegada do pedido, ou seja, caso esteja algum escritor à espera e novos leitores cheguem depois, estes leitores vão passar à "frente" do escritor que já estava à mais tempo à espera. Por isso adpatamos este código com o exemplo dos professores, ou seja, fazer uma fila de espera. Por tanto, o nosso código permite que vários utilizadores leiam ao mesmo tempo, bloqueando os escritores, mas caso cheguem novos pedidos para ler, estes não irão passar à "frente" dos escritores que já estão na fila de espera. Caso algum escritor esteja a escrever, nenhum leitor conseguirá ler os dados da hash table. Para o caso da concorrência da estrutura que guarda as estatisticas, apenas fazemos um lock e unlock tanto para o update como para o getStats();
 
 Também fizemos alteração de alguns ficheiros das etapas anterios, nomeadamente:
     1º client_stub.h / client_stub.h: Foi acrescentado a função getStats(), onde este faz o pedido da estrutura que guarda as estatisticas do servidor.
-
-    2º table_skel.h / table_skel.c: Foi reajustada a assinatura da função invoke(). Esta passou a receber, para além da Message_t também um inteiro que representa o ticket da thread
-
+    2º table_skel.h / table_skel.c: Foi reajustada a assinatura da função invoke(). Esta passou a receber, para além da Message_t também um inteiro que representa o ticket da   thread
     3º network_server.c: Foi adicionado a função private thread_main_loop() que é invocada quando uma thread é criada na função main_loop(). A função main_loop(), como obvio foi alterada devido ao que já foi explicado anteriormente.

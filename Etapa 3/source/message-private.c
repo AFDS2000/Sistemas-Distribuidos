@@ -39,7 +39,6 @@ int read_all(int sock, uint8_t *buf, int len)
         {
             if (errno == EINTR)
                 continue;
-            perror("read failed:");
             return res;
         }
         buf += res;

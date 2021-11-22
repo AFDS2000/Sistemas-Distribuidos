@@ -16,18 +16,30 @@
 #include "message-private.h"
 #include "table.h"
 #include "stats_server-private.h"
+#include "ctrl_mutex-private.h"
+
+static unsigned int tickets = 1;
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *thread_main_loop(void *params)
 {
     int connsockfd = *(int *)params;
-
     MessageT *msg;
     while ((msg = network_receive(connsockfd)) != NULL)
     {
         clock_t tempo = clock();
         int opcode = msg->opcode;
+        int ticket = 0;
 
-        if (invoke(msg) < 0)
+        if(opcode != MESSAGE_T__OPCODE__OP_STATS)
+        {
+            pthread_mutex_lock(&mutex);
+            ticket = tickets;
+            tickets++;
+            pthread_mutex_unlock(&mutex);
+        }
+
+        if (invoke(msg, ticket) < 0)
         {
             perror("Erro ao ler dados");
             close(connsockfd);
@@ -41,14 +53,20 @@ void *thread_main_loop(void *params)
             printf("Closed conection\n");
             continue;
         }
-        tempo = clock() - tempo;
-        double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
-        update_stats(opcode, time_taken);
+
+        if (opcode != MESSAGE_T__OPCODE__OP_STATS)
+        {
+            tempo = clock() - tempo;
+            double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
+            lock_stats();
+            update_stats(opcode, time_taken);
+            unlock_stats();
+        }
     }
     // Fecha socket referente a esta conexão
     close(connsockfd);
     printf("Client exit: %d\n", connsockfd);
-    return NULL;
+    pthread_exit(0);
 }
 
 /* Função para preparar uma socket de receção de pedidos de ligação
@@ -112,12 +130,18 @@ int network_main_loop(int listening_socket)
         signal(SIGPIPE, SIG_IGN);
         printf("Conection accept\n");
 
-        pthread_t nova;
+        pthread_t new_thread;
+
         /* criação de nova thread */
-        if (pthread_create(&nova, NULL, &thread_main_loop, (void *)&connsockfd) != 0)
+        if (pthread_create(&new_thread, NULL, &thread_main_loop, (void *)&connsockfd) != 0)
         {
             perror("\nThread não criada.\n");
-            exit(EXIT_FAILURE);
+            //exit(EXIT_FAILURE);
+        }
+
+        if (pthread_detach(new_thread) != 0) {
+            perror("pthread_detach() error");
+            exit(4);
         }
     }
     return 0;
@@ -135,7 +159,6 @@ MessageT *network_receive(int client_socket)
     // Primeiro read recebe o unsigned len
     if (read_all(client_socket, &buffer_recv_buf, sizeof(unsigned int)) <= 0)
     {
-        perror("Erro ao receber dados do cliente");
         return NULL;
     }
     memcpy(&buffer_len_recv, &buffer_recv_buf, sizeof(unsigned int));

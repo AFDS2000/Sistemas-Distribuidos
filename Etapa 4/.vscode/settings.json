@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "stats-private.h": "c",
+        "message-private.h": "c",
+        "random": "cpp",
+        "table_skel-private.h": "c",
+        "list.h": "c",
+        "table.h": "c",
+        "table-private.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c"
+    }
+}

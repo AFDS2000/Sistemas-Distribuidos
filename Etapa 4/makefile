@@ -39,7 +39,7 @@ table_skel-private.o = table_skel-private.h stats_server-private.h
 stats_server-private.o = states_server-private.h stats-private.h sdmessage.pb-c.h
 
 CC = gcc
-CFLAGS = -Wall -g -O0
+CFLAGS = -Wall -g -O0 -D THREADED -lzookeeper_mt
 LDFLAGS = ${PROTOC_DIR}lib/libprotobuf-c.a
 
 vpath %.o $(OBJ_DIR)

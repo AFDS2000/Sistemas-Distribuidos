@@ -28,4 +28,6 @@ void table_skel_destroy();
 */
 int invoke(MessageT *msg);
 
+int zoo_init(char *ip_port, char *port);
+
 #endif

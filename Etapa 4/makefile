@@ -13,7 +13,7 @@ table_client_objects = table_client.o client-lib.o
 
 #server
 table_server_objects = data.o entry.o list.o table.o table-private.o table_server.o network_server.o \
-	table_skel.o table_skel-private.o sdmessage.pb-c.o message-private.o stats_server-private.o
+	table_skel.o table_skel-private.o sdmessage.pb-c.o message-private.o stats_server-private.o zookeeper_server-private.o
 
 #client-lib
 cliet_lib_objects = data.o entry.o list.o table.o table-private.o client_stub.o network_client.o message-private.o sdmessage.pb-c.o
@@ -31,12 +31,13 @@ table_client.o = data.h client_stub.h client_stub-private.h
 client_stub.o = table.h client_stub.h client_stub-private.h sdmessage.pb-c.h message-private.h stats-private.h
 network_client.o = network_client.h client_stub-private.h message-private.h
 
-table_server.o = table_skel.h network_server.h stats_server-private.o
+table_server.o = table_skel.h network_server.h stats_server-private.o zookeeper_server-private.o
 network_server.o = table.h message-private.h inet-private.h table_skel.h network_server.h sdmessage.pb-c.h stats_server-private.o
-table_skel.o = table_skel.h table_skel-private.h stats_server-private.h
-table_skel-private.o = table_skel-private.h stats_server-private.h
+table_skel.o = table_skel.h table_skel-private.h stats_server-private.h zookeeper_server-private.h
+table_skel-private.o = table_skel-private.h stats_server-private.h zookeeper_server-private.h
 
 stats_server-private.o = states_server-private.h stats-private.h sdmessage.pb-c.h
+zookeeper_server-private.o = zookeeper_server-private.h
 
 CC = gcc
 CFLAGS = -Wall -g -O0 -D THREADED -lzookeeper_mt
@@ -62,7 +63,7 @@ table-client: $(table_client_objects)
 	$(CC) $(OBJ_DIR)/table_client.o lib/client-lib.o -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 table-server: $(table_server_objects)
-	$(CC) -pthread $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
+	$(CC) -pthread -lzookeeper_mt $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 clean:
 	rm -f $(OBJ_DIR)/*.o

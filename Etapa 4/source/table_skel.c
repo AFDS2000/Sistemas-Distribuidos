@@ -10,6 +10,7 @@
 #include "table_skel.h"
 #include "table_skel-private.h"
 #include "stats_server-private.h"
+#include "zookeeper_server-private.h"
 
 static struct table_t *table;
 
@@ -30,6 +31,12 @@ int table_skel_init(int n_lists)
 void table_skel_destroy()
 {
     table_destroy(table);
+}
+
+int zoo_init(char *ip_port, char *port)
+{
+    struct zookeeper_data *zoo = NULL;
+    int a = init_zookeeper(zoo, ip_port, port);
 }
 
 /* Executa uma operação na tabela (indicada pelo opcode contido em msg)

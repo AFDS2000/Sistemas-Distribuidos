@@ -8,9 +8,11 @@
             "name": "(gdb) Iniciar",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/binary/table-client",
+            "program": "${workspaceFolder}/binary/table-server",
             "args": [
-                "192.168.1.98:255655"
+                "255655",
+                "5",
+                "localhost:2181"
             ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

@@ -24,7 +24,7 @@ void closeSocket(int num)
 
 int main(int argc, char const *argv[])
 {
-    if (argc != 3)
+    if (argc != 4)
     {
         printf("Erro na execução\n");
         printf("Uso: ./<path_to_exe>/table-server <port> <n_lists>\n");
@@ -35,6 +35,7 @@ int main(int argc, char const *argv[])
     int err;
     short port = atoi(argv[1]);
     int n_lists = atoi(argv[2]);
+    zoo_init((char *)argv[3], (char *)argv[1]);
 
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 
@@ -46,6 +47,8 @@ int main(int argc, char const *argv[])
         printf("Erro ao preprar o socket");
         return -1;
     }
+
+    // processo de verificar primary, backup e depois escolher ou fechar o programa
 
     // inicializar a table
     err = table_skel_init(n_lists);

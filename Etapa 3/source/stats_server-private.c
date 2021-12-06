@@ -1,6 +1,11 @@
+/* Grupo 31
+ * André Cabaço 53457
+ * André Seixas 53870
+ * Miguel Agostinho 53475
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "stats_server-private.h"
 #include "sdmessage.pb-c.h"

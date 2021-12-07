@@ -46,7 +46,7 @@ LDFLAGS = ${PROTOC_DIR}lib/libprotobuf-c.a
 vpath %.o $(OBJ_DIR)
 
 %.o: $(SRC_DIR)/%.c $($@)
-	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $< -lzookeeper_mt
+	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
 
 all: table-client table-server 
 	
@@ -63,7 +63,7 @@ table-client: $(table_client_objects)
 	$(CC) $(OBJ_DIR)/table_client.o lib/client-lib.o -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 table-server: $(table_server_objects)
-	$(CC) -pthread $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@ -lzookeeper_mt
+	$(CC) $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -pthread -lprotobuf-c -lzookeeper_mt -o $(BIN_DIR)/$@
 
 clean:
 	rm -f $(OBJ_DIR)/*.o

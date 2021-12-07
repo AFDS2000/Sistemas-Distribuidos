@@ -7,14 +7,6 @@
 #ifndef _ZOOKEEPER_SERVER_PRIVATE_H
 #define _ZOOKEEPER_SERVER_PRIVATE_H
 
-#include <time.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <zookeeper/zookeeper.h>
-
 struct zookeeper_data
 {
     int is_primary;

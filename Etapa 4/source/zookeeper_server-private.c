@@ -1,6 +1,15 @@
-#include "zookeeper_server-private.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
 #include <zookeeper/zookeeper.h>
+
+#include "zookeeper_server-private.h"
+
 #define ZDATALEN 1024 * 1024
+
 typedef struct String_vector zoo_string;
 
 static zhandle_t *zh;
@@ -68,7 +77,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                     fprintf(stderr, "Error creating znode from path %s!\n", primary);
                     exit(EXIT_FAILURE);
                 }
-                zoo_delete(zh, backup, NULL);
+                zoo_delete(zh, backup, -1);
 
                 zookeeper->is_primary = 1;
                 zookeeper->is_backup = 0;
@@ -113,7 +122,7 @@ int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port
         }
 
         zoo_string *children_list = NULL;
-
-        return 0;
     }
+
+    return 0;
 }

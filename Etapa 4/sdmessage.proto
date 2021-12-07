@@ -17,6 +17,7 @@
                  OP_PRINT   = 60;
                  OP_STATS = 70;
                  OP_ERROR   = 99;
+                 OP_ERROR_WRITE = 100;
          }
          Opcode opcode = 1;
  

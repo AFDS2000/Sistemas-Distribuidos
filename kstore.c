@@ -175,11 +175,6 @@ int main(void)
             if (ZOK == nodePrimary)
             {
                 is_primary = 1;
-
-                while (1)
-                {
-                    printf("\n primary: %d", is_primary);
-                }
             }
             else
             {

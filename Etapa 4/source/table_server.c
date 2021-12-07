@@ -19,6 +19,7 @@ void closeSocket(int num)
     network_server_close(server_socket);
     table_skel_destroy(); // destroir a tabela
     stats_server_destroy();
+    zookeeper_destroy();
     exit(0);
 }
 
@@ -35,7 +36,10 @@ int main(int argc, char const *argv[])
     int err;
     short port = atoi(argv[1]);
     int n_lists = atoi(argv[2]);
-    zoo_init((char *)argv[3], (char *)argv[1]);
+    if (zoo_init((char *)argv[3], (char *)argv[1]) != 0)
+    {
+        closeSocket(0);
+    }
 
     printf("Port: %d\nN-lists: %d\n", port, n_lists);
 

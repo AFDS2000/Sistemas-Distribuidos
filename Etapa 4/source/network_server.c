@@ -107,6 +107,10 @@ int network_main_loop(int listening_socket)
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
+    while (1)
+    {
+        printf("\nmain");
+    }
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
         signal(SIGPIPE, SIG_IGN);

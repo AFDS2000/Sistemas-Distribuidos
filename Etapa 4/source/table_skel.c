@@ -33,6 +33,11 @@ void table_skel_destroy()
     table_destroy(table);
 }
 
+void zookeeper_destroy()
+{
+    zoo_destroy();
+}
+
 int zoo_init(char *ip_port, char *port)
 {
     struct zookeeper_data *zoo = NULL;

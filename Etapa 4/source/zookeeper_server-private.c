@@ -68,7 +68,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                     fprintf(stderr, "Error creating znode from path %s!\n", primary);
                     exit(EXIT_FAILURE);
                 }
-                zoo_delete(zh, backup, NULL);
+                zoo_delete(zh, backup, -1);
 
                 zookeeper->is_primary = 1;
                 zookeeper->is_backup = 0;

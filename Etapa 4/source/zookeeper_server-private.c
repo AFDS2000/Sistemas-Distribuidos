@@ -25,6 +25,26 @@ void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, v
     }
 }
 
+int create_node(zhandle_t *zh, const char *location, char *buffer, int buffer_len, int flags, char *new_path, int new_path_len)
+{
+    int zoo = zoo_create(zh, location, buffer, buffer_len, &ZOO_OPEN_ACL_UNSAFE, flags, new_path, new_path_len);
+    if (ZNODEEXISTS == zoo)
+    {
+        return zoo;
+    }
+    else
+    {
+        if (ZOK != zoo)
+        {
+            fprintf(stderr, "Error creating znode from path %s!\n", location);
+            return zoo;
+        }
+        printf("%s doesn't exist! \nCreating.\n ", location);
+        printf("%s created", location);
+        return zoo;
+    }
+}
+
 static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath, void *watcher_ctx)
 {
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string));

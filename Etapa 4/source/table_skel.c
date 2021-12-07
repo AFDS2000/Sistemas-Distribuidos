@@ -37,6 +37,7 @@ int zoo_init(char *ip_port, char *port)
 {
     struct zookeeper_data *zoo = NULL;
     int a = init_zookeeper(zoo, ip_port, port);
+    return a;
 }
 
 /* Executa uma operação na tabela (indicada pelo opcode contido em msg)

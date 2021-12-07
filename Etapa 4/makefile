@@ -39,14 +39,14 @@ table_skel-private.o = table_skel-private.h stats_server-private.h zookeeper_ser
 stats_server-private.o = states_server-private.h stats-private.h sdmessage.pb-c.h
 zookeeper_server-private.o = zookeeper_server-private.h
 
-CC = gcc
-CFLAGS = -Wall -g -O0 -D THREADED -lzookeeper_mt
-LDFLAGS = ${PROTOC_DIR}lib/libprotobuf-c.a
+CC = gcc 
+CFLAGS = -Wall -g -O0 -D THREADED
+LDFLAGS = ${PROTOC_DIR}lib/libprotobuf-c.a 
 
 vpath %.o $(OBJ_DIR)
 
 %.o: $(SRC_DIR)/%.c $($@)
-	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $<
+	$(CC) $(CFLAGS) -I include/ -o $(OBJ_DIR)/$@ -c $< -lzookeeper_mt
 
 all: table-client table-server 
 	
@@ -63,7 +63,7 @@ table-client: $(table_client_objects)
 	$(CC) $(OBJ_DIR)/table_client.o lib/client-lib.o -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
 
 table-server: $(table_server_objects)
-	$(CC) -pthread -lzookeeper_mt $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@
+	$(CC) -pthread $(addprefix $(OBJ_DIR)/,$(table_server_objects)) -I $(PROTOC_DIR)include -L $(PROTOC_DIR)lib -lprotobuf-c -o $(BIN_DIR)/$@ -lzookeeper_mt
 
 clean:
 	rm -f $(OBJ_DIR)/*.o

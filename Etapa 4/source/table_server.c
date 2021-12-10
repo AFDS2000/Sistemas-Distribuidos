@@ -62,7 +62,6 @@ int main(int argc, char const *argv[])
         network_server_close(server_socket);
         return err;
     }
-
     stats_server_init();
 
     network_main_loop(server_socket);

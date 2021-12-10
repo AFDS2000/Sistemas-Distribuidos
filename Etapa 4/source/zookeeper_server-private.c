@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <zookeeper/zookeeper.h>
+#include "inet-private.h"
 
 #include "zookeeper_server-private.h"
 
@@ -17,7 +18,7 @@ static char *root_path = "/kvstore";
 static char *primary = "/kvstore/primary";
 static char *backup = "/kvstore/backup";
 int is_connected;
-struct zookeeper_data *zookeeper;
+static struct zookeeper_data *zookeeper;
 static char *watcher_ctx = "ZooKeeper Data Watcher";
 
 void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, void *context)
@@ -45,7 +46,6 @@ int create_node(zhandle_t *zh, const char *location, char *buffer, int buffer_le
 static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath, void *watcher_ctx)
 {
 
-    int zoo_data_len = ZDATALEN;
     if (state == ZOO_CONNECTED_STATE)
     {
         if (type == ZOO_CHILD_EVENT)
@@ -58,28 +58,41 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
             // torna backup em primary mas deve ser feito em watcher
             if (ZNONODE == zoo_exists(zh, primary, 0, NULL) && zookeeper->is_backup == 1)
             {
+                zoo_delete(zh, backup, -1);
 
-                int a = zoo_create(zh, primary, zookeeper->backup_ip, strlen(zookeeper->backup_ip), &ZOO_OPEN_ACL_UNSAFE, ZOO_EPHEMERAL, NULL, 0);
-                if (ZOK != a)
+                if (ZOK != zoo_create(zh, primary, zookeeper->backup_ip, strlen(zookeeper->backup_ip), &ZOO_OPEN_ACL_UNSAFE, ZOO_EPHEMERAL, NULL, 0))
                 {
                     fprintf(stderr, "Error creating znode from path %s!\n", primary);
                     exit(EXIT_FAILURE);
                 }
-                zoo_delete(zh, backup, -1);
-
+                free(zookeeper->primary_ip);
+                zookeeper->primary_ip = zookeeper->backup_ip;
+                zookeeper->backup_ip = NULL;
                 zookeeper->is_primary = 1;
                 zookeeper->is_backup = 0;
                 printf("\nbackup evolves to primary");
             }
-            while (zookeeper->is_primary == 1 && ZNONODE == zoo_exists(zh, backup, 0, NULL))
+            //Se for servidor primario e o backup tiver saido, nao aceita mais pedidos de
+            //escrita dos clientes ate que volte a haver backup. Volta a ativar o watch.
+            if (zookeeper->is_primary == 1 && ZNONODE == zoo_exists(zh, backup, 0, NULL))
             {
-                sleep(1);
+                zookeeper->write_enable = 0;
+            }
+            if (zookeeper->is_primary == 1 && ZOK == zoo_exists(zh, backup, 0, NULL))
+            {
+                if (zookeeper->backup_ip == NULL)
+                {
+                    zookeeper->backup_ip = calloc(1, ZDATALEN);
+                }
+                int len = ZDATALEN;
+                zoo_get(zh, backup, 0, zookeeper->backup_ip, &len, NULL);
+                zookeeper->write_enable = 1;
             }
         }
     }
 }
 
-int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port)
+struct zookeeper_data *init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port)
 {
     zh = zookeeper_init(ip_port, connection_watcher, 2000, 0, 0, 0);
     int data_len = ZDATALEN * sizeof(char);
@@ -92,6 +105,7 @@ int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port
     zookeeper = calloc(1, sizeof(struct zookeeper_data));
     zookeeper->is_backup = 0;
     zookeeper->is_primary = 0;
+    zookeeper->write_enable = 0;
     zookeeper->backup_ip = NULL;
     zookeeper->primary_ip = NULL;
     zookeeper->children_list = (zoo_string *)malloc(sizeof(zoo_string));
@@ -106,7 +120,7 @@ int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port
             fprintf(stderr, "Error creating znode from path %s!\n", primary);
             exit(EXIT_FAILURE);
         }
-        char *localhost = "localhost:";
+        char *localhost = "127.0.0.1:";
         char *temp_ip = calloc(1, ZDATALEN);
         strcat(temp_ip, localhost);
         strcat(temp_ip, port);
@@ -135,9 +149,9 @@ int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port
                 if (ZOK != zoo_wget_children(zh, root_path, &child_watcher, watcher_ctx, zookeeper->children_list))
                 {
                     fprintf(stderr, "Error setting watch at %s!\n", root_path);
-                    return -1;
+                    return NULL;
                 }
-                return 0;
+                return zookeeper;
             }
             else
             {
@@ -154,42 +168,86 @@ int init_zookeeper(struct zookeeper_data *zoo_pointer, char *ip_port, char *port
                         zookeeper->backup_ip = temp_ip;
                         zookeeper->is_backup = 1;
                         zookeeper->primary_ip = calloc(1, ZDATALEN);
+                        zookeeper->write_enable = 1;
                         zoo_get(zh, primary, 0, zookeeper->primary_ip, &data_len, NULL);
                         if (ZOK != zoo_wget_children(zh, root_path, &child_watcher, watcher_ctx, zookeeper->children_list))
                         {
                             fprintf(stderr, "Error setting watch at %s!\n", root_path);
                         }
-                        return 0;
+                        return zookeeper;
                     }
                     else
                     {
-                        return -1;
+                        return NULL;
                     }
                 }
             }
         }
-        return 0;
+        return zookeeper;
     }
-    return 2;
+    return NULL;
 }
 
 void zoo_destroy()
 {
-    zookeeper_close(zh);
     if (zookeeper)
     {
-        if (zookeeper->children_list)
+        if (zookeeper->children_list != NULL)
         {
             free(zookeeper->children_list);
         }
-        if (zookeeper->backup_ip)
+        if (zookeeper->backup_ip != NULL)
         {
             free(zookeeper->backup_ip);
         }
-        if (zookeeper->primary_ip)
+        if (zookeeper->primary_ip != NULL)
         {
             free(zookeeper->primary_ip);
         }
         free(zookeeper);
+    }
+    zookeeper_close(zh);
+}
+
+int backup_client()
+{
+
+    if (zookeeper->is_primary == 1 && ZOK == zoo_exists(zh, backup, 0, NULL))
+    {
+        struct sockaddr_in serv_addr;
+        int sock = 0;
+
+        if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        {
+            perror("Erro ao criar socket TCP");
+            return -1;
+        }
+        serv_addr.sin_family = AF_INET;
+        char *addr_port = strdup(zookeeper->backup_ip);
+        char *token;
+        const char s[2] = ":";
+        token = strtok(addr_port, s);
+        char *ip = token;
+        token = strtok(NULL, s);
+        int port = atoi(token);
+        // família de endereços
+        serv_addr.sin_port = htons(port); // Porta TCP
+        if (inet_pton(AF_INET, ip, &serv_addr.sin_addr) < 1)
+        {
+            printf("Erro ao converter IP\n");
+            close(sock);
+            return -1;
+        }
+        if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+            perror("Erro ao conectar-se ao servidor");
+            close(sock);
+            return -1;
+        }
+        return sock;
+    }
+    else
+    {
+        return -1;
     }
 }

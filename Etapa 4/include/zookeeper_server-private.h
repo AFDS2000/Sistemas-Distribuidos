@@ -14,8 +14,10 @@ struct zookeeper_data
     char *primary_ip;
     char *backup_ip;
     struct String_vector *children_list;
+    int write_enable;
 };
-int init_zookeeper(struct zookeeper_data *, char *, char *);
+struct zookeeper_data *init_zookeeper(struct zookeeper_data *, char *, char *);
 
 void zoo_destroy();
+
 #endif

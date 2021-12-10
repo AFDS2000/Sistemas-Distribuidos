@@ -32,4 +32,6 @@ int invoke(MessageT *msg);
 
 int zoo_init(char *ip_port, char *port);
 
+int backup_client();
+
 #endif

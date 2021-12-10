@@ -223,7 +223,6 @@ int network_send(int client_socket, MessageT *msg)
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
-
     message_t__free_unpacked(msg, NULL);
     free(buf);
     return 0;

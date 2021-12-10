@@ -186,3 +186,8 @@ void get_stats(MessageT *msg, struct statistics *stats)
     msg->stats->ntable_prints = stats->nTable_prints;
     msg->stats->avg_per_operation = stats->avg_per_operation;
 }
+
+void write_error(MessageT *msg)
+{
+    msg->opcode = MESSAGE_T__OPCODE__OP_ERROR_WRITE;
+}

@@ -10,6 +10,11 @@
         "array": "c",
         "string": "c",
         "string_view": "c",
-        "zookeeper_server-private.h": "c"
+        "zookeeper_server-private.h": "c",
+        "network_client.h": "c",
+        "client_stub-private.h": "c",
+        "sdmessage.pb-c.h": "c",
+        "client_stub.h": "c",
+        "zookeeper.h": "c"
     }
 }

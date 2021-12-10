@@ -24,9 +24,33 @@ void *thread_main_loop(void *params)
     MessageT *msg;
     while ((msg = network_receive(connsockfd)) != NULL)
     {
+        MessageT *msg_copy = NULL;
+        int backup = backup_client();
+        if (backup != -1)
+        {
+            uint8_t *buf = NULL;
+            int len = message_t__get_packed_size(msg);
+            buf = malloc(len);
+            uint8_t *buff = malloc(len);
+            message_t__pack(msg, buf);
+            memcpy(buff, buf, len);
+            msg_copy = message_t__unpack(NULL, len, buff);
+
+            if (network_send(backup, msg_copy) < 0)
+            {
+                close(backup);
+                printf("Closed conection\n");
+                continue;
+            }
+            msg_copy = network_receive(backup);
+        }
         clock_t tempo = clock();
         int opcode = msg->opcode;
-
+        if (msg_copy != NULL && (msg_copy->opcode == (MESSAGE_T__OPCODE__OP_ERROR || MESSAGE_T__OPCODE__OP_ERROR_WRITE)))
+        {
+            message_t__free_unpacked(msg, NULL); // liberta a mensagem original e reaponta msg para a copy onde este tem o opcode de erro que depois eh capturado no invoke e responde erro devolta
+            msg = msg_copy;
+        }
         if (invoke(msg) < 0)
         {
             perror("Erro ao ler dados");
@@ -107,10 +131,7 @@ int network_main_loop(int listening_socket)
     // accept bloqueia à espera de pedidos de conexão.
     // Quando retorna já foi feito o "three-way handshake" e connsockfd é uma
     // socket pronta a comunicar com o cliente.
-    while (1)
-    {
-        printf("\nmain");
-    }
+
     while ((connsockfd = accept(listening_socket, (struct sockaddr *)&client, &size_client)) != -1)
     {
         signal(SIGPIPE, SIG_IGN);

@@ -28,4 +28,6 @@ void table_to_string(MessageT *msg, struct table_t *table);
 
 void get_stats(MessageT *msg, struct statistics *stats);
 
+void write_error(MessageT *msg);
+
 #endif

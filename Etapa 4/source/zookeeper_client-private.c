@@ -13,9 +13,12 @@
 
 typedef struct String_vector zoo_string;
 extern struct rtable_t *table;
+extern int primary_exists;
 
 char *root_path = "/kvstore";
-char *primary = "/primary";
+char *primary = "/kvstore/primary";
+zhandle_t *zh;
+static int is_connected;
 struct zookeeper_data *zookeeper;
 
 void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, void *context)
@@ -23,9 +26,9 @@ void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, v
     if (type == ZOO_SESSION_EVENT)
     {
         if (state == ZOO_CONNECTED_STATE)
-            table->is_zk_connected = 1;
+            is_connected = 1;
         else
-            table->is_zk_connected = 0;
+            is_connected = 0;
     }
 }
 
@@ -35,7 +38,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
     zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string));
 
     /* Get the updated children and reset the watch */
-    if (ZOK != zoo_wget_children(table->zh, root_path, child_watcher, watcher_ctx, children_list))
+    if (ZOK != zoo_wget_children(zh, root_path, child_watcher, watcher_ctx, children_list))
     {
         fprintf(stderr, "Error setting watch at %s!\n", root_path);
     }
@@ -44,19 +47,19 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
     {
         if (type == ZOO_CHILD_EVENT)
         {
-            if (ZNONODE == zoo_exists(table->zh, primary, 0, NULL) && table->primary_exists == 1)
+            if (ZNONODE == zoo_exists(zh, primary, 0, NULL) && primary_exists == 1)
             {
-                table->primary_exists = 0;
+                primary_exists = 0;
                 rtable_disconnect(table);
                 table->ip = NULL;
                 table->port = 0;
             }
-            else if (ZOK == zoo_exists(table->zh, primary, 0, NULL) && table->primary_exists == 0)
+            else if (ZOK == zoo_exists(zh, primary, 0, NULL) && primary_exists == 0)
             {
                 int data_len = ZDATALEN * sizeof(char);
-                table->primary_exists = 1;
+                primary_exists = 1;
                 char *ip_port = malloc(data_len);
-                zoo_get(table->zh, primary, 0, ip_port, &data_len, NULL);
+                zoo_get(zh, primary, 0, ip_port, &data_len, NULL);
                 printf("%s", ip_port);
                 table = rtable_connect(ip_port);
             }
@@ -66,37 +69,36 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
     }
 }
 
-void init_zookeeper(char *ip_port)
+void init_zookeeper(const char *ip_port)
 {
     int data_len = ZDATALEN * sizeof(char);
-    if ((table->zh = zookeeper_init(ip_port, connection_watcher, 2000, 0, 0, 0)) == NULL)
+    if ((zh = zookeeper_init(ip_port, connection_watcher, 2000, 0, 0, 0)) == NULL)
     {
         fprintf(stderr, "Error connecting to ZooKeeper server[%d]!\n", errno);
         exit(EXIT_FAILURE);
     }
     sleep(1);
 
-    if (table->is_zk_connected)
+    if (is_connected == 1)
     {
         zoo_string *children_list = (zoo_string *)malloc(sizeof(zoo_string));
 
-        if (ZOK != zoo_wget_children(table->zh, root_path, &child_watcher, NULL, children_list))
+        if (ZOK != zoo_wget_children(zh, root_path, &child_watcher, NULL, children_list))
         {
             fprintf(stderr, "Error setting watch at %s!\n", root_path);
             return;
         }
 
-        if (ZOK == zoo_exists(table->zh, primary, 0, NULL))
+        if (ZOK == zoo_exists(zh, primary, 0, NULL))
         {
-            table->primary_exists = 1;
             char *ip_port = malloc(data_len);
-            zoo_get(table->zh, primary, 0, ip_port, &data_len, NULL);
-            printf("%s", ip_port);
+            zoo_get(zh, primary, 0, ip_port, &data_len, NULL);
             table = rtable_connect(ip_port);
+            primary_exists = 1;
         }
         else
         {
-            table->primary_exists = 0;
+            primary_exists = 0;
         }
     }
     return;

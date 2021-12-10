@@ -7,6 +7,6 @@
 #ifndef _ZOOKEEPER_CLIENT_PRIVATE_H
 #define _ZOOKEEPER_CLIENT_PRIVATE_H
 
-char *init_zookeeper(char *);
+void init_zookeeper(const char *);
 
 #endif

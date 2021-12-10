@@ -12,6 +12,7 @@
         "string_view": "c",
         "zookeeper_server-private.h": "c",
         "zookeeper.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "client_stub.h": "c"
     }
 }

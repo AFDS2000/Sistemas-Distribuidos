@@ -21,6 +21,8 @@ struct rtable_t *table;
 struct data_t *data;
 struct entry_t *entry;
 
+int primary_exists;
+
 void closeLigacao(int num)
 {
 
@@ -52,13 +54,11 @@ int main(int argc, char *argv[])
 
     char input[MAX_LEN] = "";
 
-    table = rtable_connect(argv[1]);
-    if (!table)
-        closeLigacao(0);
+    zk_connect(argv[1]);
     
     do
     {
-        while(table->primary_exists == 0) {
+        while(primary_exists == 0) {
             printf("Trying connect to ther server...\n");
             sleep(1);
         }

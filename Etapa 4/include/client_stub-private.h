@@ -9,6 +9,7 @@
 
 #include <errno.h>
 #include "inet-private.h"
+#include <zookeeper/zookeeper.h>
 
 struct rtable_t
 {
@@ -16,6 +17,9 @@ struct rtable_t
     char *ip;
     int socket;
     struct sockaddr_in addr;
+    zhandle_t *zh;
+    int is_zk_connected;
+    int primary_exists;
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 
 #include "client_stub.h"
 #include "stats-private.h"
@@ -24,19 +25,17 @@ void closeLigacao(int num)
 {
 
     if (!entry)
-    {
         entry_destroy(entry);
-    }
+    
     if (!data)
-    {
         data_destroy(data);
-    }
-    if (table != NULL)
-    {
+    
+    if (table)
         rtable_disconnect(table);
-    }
+    
     exit(0);
 }
+
 int main(int argc, char *argv[])
 {
 
@@ -55,11 +54,15 @@ int main(int argc, char *argv[])
 
     table = rtable_connect(argv[1]);
     if (!table)
-    {
         closeLigacao(0);
-    }
+    
     do
     {
+        while(table->primary_exists == 0) {
+            printf("Trying connect to ther server...\n");
+            sleep(1);
+        }
+        
         printf("\nComandos do Utilizador:\n");
         printf("  size\n");
         printf("  del <key>\n");

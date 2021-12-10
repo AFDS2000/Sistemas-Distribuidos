@@ -9,15 +9,10 @@
 
 #include "table.h"
 #include "stats-private.h"
-#include "client_stub-private.h"
 #include "client_stub.h"
 #include "network_client.h"
 #include "sdmessage.pb-c.h"
 #include "message-private.h"
-
-/* Remote table, que deve conter as informações necessárias para estabelecer a comunicação com o servidor. A definir pelo grupo em client_stub-private.h
- */
-struct rtable_t server;
 
 /* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
@@ -25,6 +20,9 @@ struct rtable_t server;
  */
 struct rtable_t *rtable_connect(const char *address_port)
 {
+    /* Remote table, que deve conter as informações necessárias para estabelecer a comunicação com o servidor. A definir pelo grupo em client_stub-private.h
+     */
+    struct rtable_t server;
     char *addr_port = strdup(address_port);
     char *token;
     const char s[2] = ":";

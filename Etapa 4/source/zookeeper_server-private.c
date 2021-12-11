@@ -93,25 +93,35 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 int sock = backup_client();
                 if (sock != -1)
                 {
-                    MessageT msg;
+                    static MessageT msg;
                     message_t__init(&msg);
                     msg.opcode = MESSAGE_T__OPCODE__OP_GETKEYS;
                     msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
+
                     invoke(&msg);
                     for (int i = 0; i < msg.n_keys; i++)
                     {
-                        MessageT msg_enviar;
+                        static MessageT msg_enviar;
                         message_t__init(&msg_enviar);
 
                         msg_enviar.opcode = MESSAGE_T__OPCODE__OP_GET;
                         msg_enviar.c_type = MESSAGE_T__C_TYPE__CT_NONE;
                         msg_enviar.keys = malloc(sizeof(char *));
                         msg_enviar.keys[0] = strdup(msg.keys[i]);
+
+                        msg_enviar.n_keys = 1;
                         invoke(&msg_enviar);
                         msg_enviar.opcode = MESSAGE_T__OPCODE__OP_PUT;
-                        network_send(sock, &msg_enviar);
+
+                        uint8_t *buf = NULL;
+                        int len = message_t__get_packed_size(&msg_enviar);
+                        buf = malloc(len);
+                        message_t__pack(&msg_enviar, buf);
+                        MessageT *msg_nova = message_t__unpack(NULL, len, buf);
+
+                        network_send(sock, msg_nova);
+                        free(buf);
                     }
-                    message_t__free_unpacked(&msg, NULL);
                 }
             }
         }

@@ -36,7 +36,7 @@ void *thread_main_loop(void *params)
             memcpy(buff, buf, len);
             msg_copy = message_t__unpack(NULL, len, buff);
 
-            if (network_send(backup, msg_copy) < 0)
+            if (network_send(backup, msg_copy, 1) < 0)
             {
                 close(backup);
                 printf("Closed conection\n");
@@ -59,7 +59,7 @@ void *thread_main_loop(void *params)
             continue;
         }
 
-        if (network_send(connsockfd, msg) < 0)
+        if (network_send(connsockfd, msg, 1) < 0)
         {
             close(connsockfd);
             printf("Closed conection\n");
@@ -187,7 +187,7 @@ MessageT *network_receive(int client_socket)
  * - Libertar a memória ocupada por esta mensagem;
  * - Enviar a mensagem serializada, através do client_socket.
  */
-int network_send(int client_socket, MessageT *msg)
+int network_send(int client_socket, MessageT *msg, int flag)
 {
     unsigned len, buffer_len;
     uint8_t *buf = NULL;
@@ -223,8 +223,8 @@ int network_send(int client_socket, MessageT *msg)
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
-
-    message_t__free_unpacked(msg, NULL);
+    if(flag == 1)
+        message_t__free_unpacked(msg, NULL);
     free(buf);
     return 0;
 }

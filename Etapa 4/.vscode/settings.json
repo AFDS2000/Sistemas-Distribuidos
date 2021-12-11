@@ -13,6 +13,7 @@
         "zookeeper_server-private.h": "c",
         "zookeeper.h": "c",
         "errno.h": "c",
-        "client_stub.h": "c"
+        "client_stub.h": "c",
+        "table_skel.h": "c"
     }
 }

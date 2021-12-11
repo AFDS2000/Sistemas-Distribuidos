@@ -6,7 +6,8 @@
 #include <errno.h>
 #include <zookeeper/zookeeper.h>
 #include "inet-private.h"
-
+#include "table_skel.h"
+#include "network_server.h"
 #include "zookeeper_server-private.h"
 
 #define ZDATALEN 1024 * 1024
@@ -87,6 +88,32 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 int len = ZDATALEN;
                 zoo_get(zh, backup, 0, zookeeper->backup_ip, &len, NULL);
                 zookeeper->write_enable = 1;
+                sleep(2);
+                //lixo de replicacao
+                int sock = backup_client();
+                if (sock != -1)
+                {
+                    MessageT msg;
+                    message_t__init(&msg);
+                    msg.opcode = MESSAGE_T__OPCODE__OP_GETKEYS;
+                    msg.c_type = MESSAGE_T__C_TYPE__CT_NONE;
+                    invoke(&msg);
+                    for (int i = 0; i < msg.n_keys; i++)
+                    {
+                        MessageT msg_enviar;
+                        message_t__init(&msg_enviar);
+
+                        msg_enviar.opcode = MESSAGE_T__OPCODE__OP_GET;
+                        msg_enviar.c_type = MESSAGE_T__C_TYPE__CT_NONE;
+                        msg_enviar.keys = malloc(sizeof(char *));
+                        int key_len = strlen(msg.keys[i]) + 1;
+                        msg_enviar.keys[0] = malloc(key_len);
+                        memcpy(msg_enviar.keys[0], msg.keys[i], key_len);
+                        invoke(&msg_enviar);
+                        msg_enviar.opcode = MESSAGE_T__OPCODE__OP_PUT;
+                        network_send(sock, &msg_enviar, 0);
+                    }
+                }
             }
         }
     }

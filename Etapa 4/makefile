@@ -37,7 +37,7 @@ table_server.o = table_skel.h network_server.h stats_server-private.o zookeeper_
 network_server.o = table.h message-private.h inet-private.h table_skel.h network_server.h \
 	sdmessage.pb-c.h stats_server-private.o
 table_skel.o = table_skel.h table_skel-private.h stats_server-private.h zookeeper_server-private.h
-table_skel-private.o = table_skel-private.h stats_server-private.h zookeeper_server-private.h
+table_skel-private.o = table_skel-private.h stats_server-private.h zookeeper_server-private.h network_server.h
 
 stats_server-private.o = states_server-private.h stats-private.h sdmessage.pb-c.h
 zookeeper_server-private.o = zookeeper_server-private.h

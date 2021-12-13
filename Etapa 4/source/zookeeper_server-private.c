@@ -72,7 +72,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 zookeeper->backup_ip = NULL;
                 zookeeper->is_primary = 1;
                 zookeeper->is_backup = 0;
-                printf("\nbackup evolves to primary");
+                printf("\nBackup evolves to primary");
             }
             //Se for servidor primario e o backup tiver saido, nao aceita mais pedidos de
             //escrita dos clientes ate que volte a haver backup. Volta a ativar o watch.
@@ -90,7 +90,7 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 zoo_get(zh, backup, 0, zookeeper->backup_ip, &len, NULL);
                 zookeeper->write_enable = 1;
                 sleep(2);
-                //lixo de replicacao
+
                 int sock = backup_client();
                 if (sock != -1)
                 {

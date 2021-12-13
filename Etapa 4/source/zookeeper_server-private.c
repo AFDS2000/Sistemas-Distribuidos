@@ -1,3 +1,9 @@
+/* Grupo 31
+ * André Cabaço 53457
+ * André Seixas 53870
+ * Miguel Agostinho 53475
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -37,13 +43,6 @@ void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, v
             is_connected = 0;
         }
     }
-}
-
-int create_node(zhandle_t *zh, const char *location, char *buffer, int buffer_len, int flags, char *new_path, int new_path_len)
-{
-    int zoo = zoo_create(zh, location, buffer, buffer_len, &ZOO_OPEN_ACL_UNSAFE, flags, new_path, new_path_len);
-
-    return zoo;
 }
 
 static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath, void *watcher_ctx)

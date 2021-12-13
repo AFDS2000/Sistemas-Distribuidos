@@ -19,7 +19,6 @@ char *root_path = "/kvstore";
 char *primary = "/kvstore/primary";
 zhandle_t *zh;
 static int is_connected;
-struct zookeeper_data *zookeeper;
 
 void connection_watcher(zhandle_t *zzh, int type, int state, const char *path, void *context)
 {
@@ -60,13 +59,11 @@ static void child_watcher(zhandle_t *wzh, int type, int state, const char *zpath
                 primary_exists = 1;
                 char *ip_port = malloc(data_len);
                 zoo_get(zh, primary, 0, ip_port, &data_len, NULL);
-                printf("%s", ip_port);
                 table = rtable_connect(ip_port);
             }
-
-            free(children_list);
         }
     }
+    free(children_list);
 }
 
 void init_zookeeper(const char *ip_port)
@@ -91,15 +88,23 @@ void init_zookeeper(const char *ip_port)
 
         if (ZOK == zoo_exists(zh, primary, 0, NULL))
         {
-            char *ip_port = malloc(data_len);
+            char *ip_port = calloc(1, data_len);
             zoo_get(zh, primary, 0, ip_port, &data_len, NULL);
             table = rtable_connect(ip_port);
             primary_exists = 1;
+            free(ip_port);
         }
         else
         {
             primary_exists = 0;
         }
+
+        free(children_list);
     }
     return;
+}
+
+void zoo_destroy()
+{
+    zookeeper_close(zh);
 }

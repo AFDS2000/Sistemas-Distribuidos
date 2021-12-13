@@ -9,4 +9,6 @@
 
 void init_zookeeper(const char *);
 
+void zoo_destroy();
+
 #endif

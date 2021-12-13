@@ -36,13 +36,14 @@ void *thread_main_loop(void *params)
             memcpy(buff, buf, len);
             msg_copy = message_t__unpack(NULL, len, buff);
 
-            if (network_send(backup, msg_copy, 1) < 0)
+            if (network_send(backup, msg_copy) < 0)
             {
                 close(backup);
                 printf("Closed conection\n");
                 continue;
             }
             msg_copy = network_receive(backup);
+            close(backup);
         }
         clock_t tempo = clock();
         int opcode = msg->opcode;
@@ -59,7 +60,7 @@ void *thread_main_loop(void *params)
             continue;
         }
 
-        if (network_send(connsockfd, msg, 1) < 0)
+        if (network_send(connsockfd, msg) < 0)
         {
             close(connsockfd);
             printf("Closed conection\n");
@@ -69,10 +70,11 @@ void *thread_main_loop(void *params)
         double time_taken = ((double)tempo) / CLOCKS_PER_SEC;
         update_stats(opcode, time_taken);
     }
+
     // Fecha socket referente a esta conexão
     close(connsockfd);
     printf("Client exit: %d\n", connsockfd);
-    return NULL;
+    pthread_exit(0);
 }
 
 /* Função para preparar uma socket de receção de pedidos de ligação
@@ -142,7 +144,11 @@ int network_main_loop(int listening_socket)
         if (pthread_create(&nova, NULL, &thread_main_loop, (void *)&connsockfd) != 0)
         {
             perror("\nThread não criada.\n");
-            exit(EXIT_FAILURE);
+        }
+
+        if(pthread_detach(nova)) {
+            perror("pthread_detach() error");
+            exit(4);
         }
     }
     return 0;
@@ -187,7 +193,7 @@ MessageT *network_receive(int client_socket)
  * - Libertar a memória ocupada por esta mensagem;
  * - Enviar a mensagem serializada, através do client_socket.
  */
-int network_send(int client_socket, MessageT *msg, int flag)
+int network_send(int client_socket, MessageT *msg)
 {
     unsigned len, buffer_len;
     uint8_t *buf = NULL;
@@ -223,8 +229,7 @@ int network_send(int client_socket, MessageT *msg, int flag)
         perror("Erro ao enviar dados para o cliente");
         return -1;
     }
-    if(flag == 1)
-        message_t__free_unpacked(msg, NULL);
+    message_t__free_unpacked(msg, NULL);
     free(buf);
     return 0;
 }

@@ -34,6 +34,8 @@ void closeLigacao(int num)
     
     if (table)
         rtable_disconnect(table);
+
+    zookeeper_destroy();
     
     exit(0);
 }

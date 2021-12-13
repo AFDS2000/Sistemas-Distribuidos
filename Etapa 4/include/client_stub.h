@@ -17,6 +17,8 @@ struct rtable_t;
 
 void zk_connect(const char *ip_port);
 
+void zookeeper_destroy();
+
 /* Função para estabelecer uma associação entre o cliente e o servidor, 
  * em que address_port é uma string no formato <hostname>:<port>.
  * Retorna NULL em caso de erro.

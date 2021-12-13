@@ -36,7 +36,7 @@ MessageT *network_receive(int client_socket);
  * - Libertar a memória ocupada por esta mensagem;
  * - Enviar a mensagem serializada, através do client_socket.
  */
-int network_send(int client_socket, MessageT *msg, int flag);
+int network_send(int client_socket, MessageT *msg);
 
 /* A função network_server_close() liberta os recursos alocados por
  * network_server_init(), nomeadamente fechando o listening_socket.

@@ -23,13 +23,18 @@ void zk_connect(const char *ip_port) {
     init_zookeeper(ip_port);
 }
 
+void zookeeper_destroy() {
+    zoo_destroy();
+}
+
 /* Função para estabelecer uma associação entre o cliente e o servidor,
  * em que address_port é uma string no formato <hostname>:<port>.
  * Retorna NULL em caso de erro.
  */
 struct rtable_t *rtable_connect(const char *address_port)
 {
-    char *addr_port = strdup(address_port);
+    char *addr_port = NULL;
+    addr_port = strdup(address_port);
     char *token;
     const char s[2] = ":";
     token = strtok(addr_port, s);
